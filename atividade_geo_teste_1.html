@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Atividade de Geografia</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: Arial, sans-serif; background: #f0f4f8; padding: 1rem; }
+
+  .container { max-width: 600px; margin: 0 auto; }
+
+  .header { background: #1a3a5c; color: white; border-radius: 12px 12px 0 0; padding: 1.25rem 1.5rem; text-align: center; }
+  .header h1 { font-size: 18px; font-weight: 700; }
+  .header p { font-size: 13px; opacity: 0.8; margin-top: 4px; }
+
+  .card { background: white; padding: 1.25rem 1.5rem; border-left: 1px solid #dde3ea; border-right: 1px solid #dde3ea; }
+
+  .name-section { background: #eaf0fb; border-radius: 8px; padding: 1rem 1.25rem; margin-bottom: 1rem; }
+  .name-section label { font-size: 13px; font-weight: 600; color: #1a3a5c; display: block; margin-bottom: 6px; }
+  .name-section input { width: 100%; padding: 10px 12px; border: 1px solid #b0c0d8; border-radius: 8px; font-size: 15px; outline: none; }
+  .name-section input:focus { border-color: #1a3a5c; }
+
+  .question { margin-bottom: 1.25rem; padding: 1rem 1.25rem; border: 1px solid #e5eaf0; border-radius: 10px; }
+  .question-num { font-size: 11px; font-weight: 700; color: #1a56b0; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+  .question-text { font-size: 15px; color: #1a1a1a; line-height: 1.5; margin-bottom: 12px; }
+
+  .option { display: flex; align-items: flex-start; gap: 10px; padding: 8px 10px; border-radius: 8px; cursor: pointer; margin-bottom: 4px; transition: background 0.12s; }
+  .option:hover { background: #f0f4fb; }
+  .option input[type=radio] { margin-top: 2px; accent-color: #1a3a5c; flex-shrink: 0; }
+  .option label { font-size: 14px; color: #333; cursor: pointer; line-height: 1.4; }
+  .option.selected { background: #dbeafe; border: 1px solid #93c5fd; }
+
+  .footer-card { background: white; border-radius: 0 0 12px 12px; border: 1px solid #dde3ea; border-top: none; padding: 1.25rem 1.5rem; }
+  .btn-submit { width: 100%; padding: 13px; font-size: 16px; font-weight: 700; color: white; background: #1a3a5c; border: none; border-radius: 10px; cursor: pointer; transition: background 0.15s; }
+  .btn-submit:hover { background: #14304d; }
+  .btn-submit:disabled { background: #9db3c8; cursor: not-allowed; }
+
+  .msg { display: none; margin-top: 1rem; padding: 14px 16px; border-radius: 10px; font-size: 14px; text-align: center; font-weight: 600; }
+  .msg.success { background: #dcfce7; color: #166534; display: block; }
+  .msg.error { background: #fee2e2; color: #991b1b; display: block; }
+  .msg.loading { background: #e0f2fe; color: #0c4a6e; display: block; }
+
+  .obrigatorio { color: #cc0000; margin-left: 2px; }
+  .progress { display: flex; gap: 5px; margin-bottom: 1rem; }
+  .progress-dot { width: 8px; height: 8px; border-radius: 50%; background: #d1d5db; transition: background 0.2s; }
+  .progress-dot.filled { background: #1a3a5c; }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="header">
+    <h1>Atividade de Geografia</h1>
+    <p>Responda com atenção e envie ao final</p>
+  </div>
+
+  <div class="card">
+    <!-- Nome -->
+    <div class="name-section">
+      <label>Seu nome completo <span class="obrigatorio">*</span></label>
+      <input type="text" id="nome" placeholder="Digite seu nome completo">
+    </div>
+
+    <!-- Progresso -->
+    <div class="progress" id="progress">
+      <div class="progress-dot" id="dot-1"></div>
+      <div class="progress-dot" id="dot-2"></div>
+      <div class="progress-dot" id="dot-3"></div>
+      <div class="progress-dot" id="dot-4"></div>
+      <div class="progress-dot" id="dot-5"></div>
+    </div>
+
+    <!-- Q1 -->
+    <div class="question">
+      <div class="question-num">Questão 1</div>
+      <div class="question-text">O que são coordenadas geográficas?</div>
+      <div class="option" onclick="selecionar(this, 'q1', 'A')">
+        <input type="radio" name="q1" value="A"> <label>A) Linhas imaginárias que dividem o mapa em países</label>
+      </div>
+      <div class="option" onclick="selecionar(this, 'q1', 'B')">
+        <input type="radio" name="q1" value="B"> <label>B) Sistema de referência formado por paralelos e meridianos que permite localizar qualquer ponto na Terra</label>
+      </div>
+      <div class="option" onclick="selecionar(this, 'q1', 'C')">
+        <input type="radio" name="q1" value="C"> <label>C) Conjunto de símbolos usados para identificar cidades em um mapa</label>
+      </div>
+      <div class="option" onclick="selecionar(this, 'q1', 'D')">
+        <input type="radio" name="q1" value="D"> <label>D) Escala numérica que indica a distância entre dois pontos</label>
+      </div>
+    </div>
+
+    <!-- Q2 -->
+    <div class="question">
+      <div class="question-num">Questão 2</div>
+      <div class="question-text">A linha imaginária que divide a Terra em Hemisfério Norte e Hemisfério Sul é chamada de:</div>
+      <div class="option" onclick="selecionar(this, 'q2', 'A')">
+        <input type="radio" name="q2" value="A"> <label>A) Meridiano de Greenwich</label>
+      </div>
+      <div class="option" onclick="selecionar(this, 'q2', 'B')">
+        <input type="radio" name="q2" value="B"> <label>B) Trópico de Capricórnio</label>
+      </div>
+      <div class="option" onclick="selecionar(this, 'q2', 'C')">
+        <input type="radio" name="q2" value="C"> <label>C) Equador</label>
+      </div>
+      <div class="option" onclick="selecionar(this, 'q2', 'D')">
+        <input type="radio" name="q2" value="D"> <label>D) Círculo Polar Ártico</label>
+      </div>
+    </div>
+
+    <!-- Q3 -->
+    <div class="question">
+      <div class="question-num">Questão 3</div>
+      <div class="question-text">O Brasil está localizado predominantemente em qual hemisfério?</div>
+      <div class="option" onclick="selecionar(this, 'q3', 'A')">
+        <input type="radio" name="q3" value="A"> <label>A) Hemisfério Norte e Hemisfério Leste</label>
+      </div>
+      <div class="option" onclick="selecionar(this, 'q3', 'B')">
+        <input type="radio" name="q3" value="B"> <label>B) Hemisfério Sul e Hemisfério Oeste</label>
+      </div>
+      <div class="option" onclick="selecionar(this, 'q3', 'C')">
+        <input type="radio" name="q3" value="C"> <label>C) Hemisfério Norte e Hemisfério Oeste</label>
+      </div>
+      <div class="option" onclick="selecionar(this, 'q3', 'D')">
+        <input type="radio" name="q3" value="D"> <label>D) Hemisfério Sul e Hemisfério Leste</label>
+      </div>
+    </div>
+
+    <!-- Q4 -->
+    <div class="question">
+      <div class="question-num">Questão 4</div>
+      <div class="question-text">O que indica a latitude de um lugar?</div>
+      <div class="option" onclick="selecionar(this, 'q4', 'A')">
+        <input type="radio" name="q4" value="A"> <label>A) A distância em relação ao Meridiano de Greenwich, medida em graus a leste ou a oeste</label>
+      </div>
+      <div class="option" onclick="selecionar(this, 'q4', 'B')">
+        <input type="radio" name="q4" value="B"> <label>B) A altitude de um ponto em relação ao nível do mar</label>
+      </div>
+      <div class="option" onclick="selecionar(this, 'q4', 'C')">
+        <input type="radio" name="q4" value="C"> <label>C) A distância em relação ao Equador, medida em graus ao norte ou ao sul</label>
+      </div>
+      <div class="option" onclick="selecionar(this, 'q4', 'D')">
+        <input type="radio" name="q4" value="D"> <label>D) A velocidade de rotação da Terra em um determinado ponto</label>
+      </div>
+    </div>
+
+    <!-- Q5 -->
+    <div class="question">
+      <div class="question-num">Questão 5</div>
+      <div class="question-text">Qual é a principal função de um mapa?</div>
+      <div class="option" onclick="selecionar(this, 'q5', 'A')">
+        <input type="radio" name="q5" value="A"> <label>A) Decorar ambientes e paredes de sala de aula</label>
+      </div>
+      <div class="option" onclick="selecionar(this, 'q5', 'B')">
+        <input type="radio" name="q5" value="B"> <label>B) Representar a superfície da Terra ou parte dela, permitindo a localização e o estudo dos espaços geográficos</label>
+      </div>
+      <div class="option" onclick="selecionar(this, 'q5', 'C')">
+        <input type="radio" name="q5" value="C"> <label>C) Mostrar apenas a divisão política entre países</label>
+      </div>
+      <div class="option" onclick="selecionar(this, 'q5', 'D')">
+        <input type="radio" name="q5" value="D"> <label>D) Registrar a história das civilizações ao longo do tempo</label>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer-card">
+    <button class="btn-submit" id="btnEnviar" onclick="enviar()">Enviar atividade</button>
+    <div class="msg" id="msg"></div>
+  </div>
+</div>
+
+<script>
+  // ⚠️ SUBSTITUA PELA URL DO SEU GOOGLE APPS SCRIPT
+  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyiCArjavmt278IUUFuk_QNt81qeqQU_hcDOeY2i3iX301gTBL7jEYV0NZjVFwDZYIPkQ/exec";
+
+  const respostas = { q1: null, q2: null, q3: null, q4: null, q5: null };
+
+  function selecionar(el, questao, valor) {
+    // Remove seleção anterior da mesma questão
+    const opts = el.parentElement.querySelectorAll('.option');
+    opts.forEach(o => o.classList.remove('selected'));
+    el.classList.add('selected');
+    el.querySelector('input').checked = true;
+    respostas[questao] = valor;
+    atualizarProgresso();
+  }
+
+  function atualizarProgresso() {
+    let i = 1;
+    for (const q in respostas) {
+      document.getElementById('dot-' + i).classList.toggle('filled', respostas[q] !== null);
+      i++;
+    }
+  }
+
+  function enviar() {
+    const nome = document.getElementById('nome').value.trim();
+    const msg = document.getElementById('msg');
+    const btn = document.getElementById('btnEnviar');
+
+    if (!nome) {
+      mostrarMsg('Por favor, informe seu nome antes de enviar.', 'error');
+      return;
+    }
+
+    const naoRespondidas = Object.values(respostas).filter(v => v === null).length;
+    if (naoRespondidas > 0) {
+      mostrarMsg('Você ainda tem ' + naoRespondidas + ' questão(ões) sem resposta.', 'error');
+      return;
+    }
+
+    btn.disabled = true;
+    mostrarMsg('Enviando suas respostas...', 'loading');
+
+    const agora = new Date();
+    const horario = agora.toLocaleString('pt-BR');
+
+    const dados = {
+      nome,
+      horario,
+      q1: respostas.q1,
+      q2: respostas.q2,
+      q3: respostas.q3,
+      q4: respostas.q4,
+      q5: respostas.q5
+    };
+
+    fetch(SCRIPT_URL, {
+      method: 'POST',
+      body: JSON.stringify(dados)
+    })
+    .then(res => res.json())
+    .then(data => {
+      if (data.status === 'ok') {
+        mostrarMsg('✅ Atividade enviada com sucesso! Obrigado, ' + nome + '.', 'success');
+        btn.textContent = 'Atividade enviada!';
+      } else {
+        throw new Error();
+      }
+    })
+    .catch(() => {
+      mostrarMsg('❌ Erro ao enviar. Verifique sua conexão e tente novamente.', 'error');
+      btn.disabled = false;
+    });
+  }
+
+  function mostrarMsg(texto, tipo) {
+    const msg = document.getElementById('msg');
+    msg.textContent = texto;
+    msg.className = 'msg ' + tipo;
+  }
+</script>
+
+</body>
+</html>
