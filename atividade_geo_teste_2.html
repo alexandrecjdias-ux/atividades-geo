@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Atividade de Geografia</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap');
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Nunito', sans-serif; background: linear-gradient(135deg, #1a3a5c 0%, #16548a 50%, #1a7a6e 100%); min-height: 100vh; padding: 1.5rem 1rem 3rem; }
+  .container { max-width: 580px; margin: 0 auto; }
+  .header { text-align: center; color: white; margin-bottom: 1.5rem; animation: fadeDown 0.6s ease; }
+  .header .emoji { font-size: 48px; margin-bottom: 8px; display: block; }
+  .header h1 { font-size: 22px; font-weight: 800; }
+  .header p { font-size: 14px; opacity: 0.85; margin-top: 4px; }
+  .progress-bar-wrap { background: rgba(255,255,255,0.2); border-radius: 20px; height: 8px; margin-bottom: 1.25rem; overflow: hidden; }
+  .progress-bar-fill { height: 100%; background: #4ade80; border-radius: 20px; transition: width 0.4s ease; width: 0%; }
+  .progress-label { text-align: center; font-size: 13px; color: rgba(255,255,255,0.85); margin-bottom: 8px; font-weight: 700; }
+  .card { background: white; border-radius: 20px; padding: 1.25rem 1.5rem; margin-bottom: 1rem; box-shadow: 0 8px 32px rgba(0,0,0,0.12); animation: fadeUp 0.5s ease both; }
+  .nome-card { border-top: 5px solid #f59e0b; }
+  .nome-label { font-size: 12px; font-weight: 800; color: #92400e; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+  .nome-input { width: 100%; padding: 12px 14px; border: 2px solid #e5e7eb; border-radius: 12px; font-family: 'Nunito', sans-serif; font-size: 15px; font-weight: 600; outline: none; transition: border 0.2s; color: #1a1a1a; }
+  .nome-input:focus { border-color: #f59e0b; }
+  .question-card { border-radius: 20px; padding: 1.25rem 1.5rem; margin-bottom: 1rem; background: white; box-shadow: 0 8px 32px rgba(0,0,0,0.12); animation: fadeUp 0.5s ease both; transition: transform 0.2s; border-top-width: 5px; border-top-style: solid; }
+  .question-card:hover { transform: translateY(-2px); }
+  .qc1 { border-top-color: #6366f1; }
+  .qc2 { border-top-color: #ec4899; }
+  .qc3 { border-top-color: #14b8a6; }
+  .qc4 { border-top-color: #f97316; }
+  .qc5 { border-top-color: #8b5cf6; }
+  .q-tag { display: inline-block; font-size: 11px; font-weight: 800; padding: 3px 10px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; }
+  .qc1 .q-tag { background: #eef2ff; color: #4338ca; }
+  .qc2 .q-tag { background: #fdf2f8; color: #be185d; }
+  .qc3 .q-tag { background: #f0fdfa; color: #0f766e; }
+  .qc4 .q-tag { background: #fff7ed; color: #c2410c; }
+  .qc5 .q-tag { background: #f5f3ff; color: #6d28d9; }
+  .q-text { font-size: 15px; font-weight: 700; color: #1a1a1a; line-height: 1.5; margin-bottom: 14px; }
+  .option { display: flex; align-items: flex-start; gap: 10px; padding: 10px 12px; border-radius: 12px; border: 2px solid #e5e7eb; margin-bottom: 8px; cursor: pointer; transition: all 0.2s; background: white; }
+  .option:hover { background: #f8fafc; border-color: #cbd5e1; }
+  .option-letter { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 800; flex-shrink: 0; background: #f1f5f9; color: #64748b; transition: all 0.2s; }
+  .option-text { font-size: 14px; font-weight: 600; color: #374151; line-height: 1.4; padding-top: 4px; }
+  .qc1 .option.sel { border-color: #6366f1; background: #eef2ff; }
+  .qc1 .option.sel .option-letter { background: #6366f1; color: white; }
+  .qc2 .option.sel { border-color: #ec4899; background: #fdf2f8; }
+  .qc2 .option.sel .option-letter { background: #ec4899; color: white; }
+  .qc3 .option.sel { border-color: #14b8a6; background: #f0fdfa; }
+  .qc3 .option.sel .option-letter { background: #14b8a6; color: white; }
+  .qc4 .option.sel { border-color: #f97316; background: #fff7ed; }
+  .qc4 .option.sel .option-letter { background: #f97316; color: white; }
+  .qc5 .option.sel { border-color: #8b5cf6; background: #f5f3ff; }
+  .qc5 .option.sel .option-letter { background: #8b5cf6; color: white; }
+  .btn-enviar { width: 100%; padding: 16px; font-family: 'Nunito', sans-serif; font-size: 17px; font-weight: 800; color: white; background: linear-gradient(135deg, #4f46e5, #7c3aed); border: none; border-radius: 16px; cursor: pointer; transition: all 0.2s; box-shadow: 0 6px 20px rgba(79,70,229,0.4); margin-top: 0.5rem; }
+  .btn-enviar:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(79,70,229,0.5); }
+  .btn-enviar:disabled { background: linear-gradient(135deg,#9ca3af,#6b7280); box-shadow: none; cursor: not-allowed; transform: none; }
+  .msg-erro { background: #fee2e2; color: #991b1b; border-radius: 12px; padding: 12px 16px; font-size: 14px; font-weight: 700; text-align: center; margin-top: 10px; display: none; animation: shake 0.4s ease; }
+  #tela-resultado { display: none; animation: fadeIn 0.6s ease; }
+  .resultado-header { text-align: center; color: white; margin-bottom: 1.5rem; }
+  .resultado-emoji { font-size: 64px; display: block; margin-bottom: 10px; animation: bounce 0.8s ease; }
+  .resultado-titulo { font-size: 24px; font-weight: 800; }
+  .resultado-sub { font-size: 14px; opacity: 0.85; margin-top: 6px; }
+  .resultado-card { background: white; border-radius: 20px; padding: 1.5rem; margin-bottom: 1rem; box-shadow: 0 8px 32px rgba(0,0,0,0.12); text-align: center; }
+  .acertos-circle { width: 110px; height: 110px; border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; margin: 0 auto 1rem; font-weight: 800; }
+  .acertos-num { font-size: 38px; line-height: 1; }
+  .acertos-label { font-size: 12px; margin-top: 2px; }
+  .gabarito-lista { text-align: left; margin-top: 1rem; }
+  .gabarito-titulo { font-size: 12px; font-weight: 800; color: #6b7280; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; }
+  .gabarito-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 12px; margin-bottom: 8px; font-weight: 700; font-size: 14px; }
+  .gabarito-item.acerto { background: #dcfce7; color: #166534; }
+  .gabarito-item.erro { background: #fee2e2; color: #991b1b; }
+  .gabarito-resp { margin-left: auto; font-size: 12px; }
+  .btn-refazer { width: 100%; padding: 14px; font-family: 'Nunito', sans-serif; font-size: 15px; font-weight: 800; color: white; background: rgba(255,255,255,0.2); border: 2px solid rgba(255,255,255,0.4); border-radius: 16px; cursor: pointer; transition: all 0.2s; margin-top: 0.5rem; }
+  .btn-refazer:hover { background: rgba(255,255,255,0.3); }
+  .loading-dots { display: inline-flex; gap: 4px; }
+  .loading-dots span { width: 8px; height: 8px; border-radius: 50%; background: white; animation: blink 1.2s infinite; }
+  .loading-dots span:nth-child(2) { animation-delay: 0.2s; }
+  .loading-dots span:nth-child(3) { animation-delay: 0.4s; }
+  .confetti-piece { position: fixed; top: -10px; border-radius: 2px; animation: confettiFall linear forwards; pointer-events: none; }
+  @keyframes fadeDown { from { opacity:0; transform:translateY(-20px); } to { opacity:1; transform:translateY(0); } }
+  @keyframes fadeUp { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+  @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
+  @keyframes bounce { 0%,100%{transform:scale(1)} 40%{transform:scale(1.2)} 70%{transform:scale(0.95)} }
+  @keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-8px)} 75%{transform:translateX(8px)} }
+  @keyframes blink { 0%,80%,100%{opacity:0} 40%{opacity:1} }
+  @keyframes confettiFall { 0%{transform:translateY(0) rotate(0deg);opacity:1} 100%{transform:translateY(100vh) rotate(720deg);opacity:0} }
+  .d1{animation-delay:0.1s} .d2{animation-delay:0.2s} .d3{animation-delay:0.3s} .d4{animation-delay:0.4s} .d5{animation-delay:0.5s} .d6{animation-delay:0.6s} .d7{animation-delay:0.7s}
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div id="tela-atividade">
+    <div class="header">
+      <span class="emoji">🌍</span>
+      <h1>Atividade de Geografia</h1>
+      <p>Coordenadas Geográficas e Cartografia</p>
+    </div>
+    <p class="progress-label" id="progress-label">0 de 5 respondidas</p>
+    <div class="progress-bar-wrap"><div class="progress-bar-fill" id="progress-bar"></div></div>
+
+    <div class="card nome-card d1">
+      <div class="nome-label">👤 Seu nome completo</div>
+      <input class="nome-input" id="nome" type="text" placeholder="Digite seu nome aqui..." oninput="atualizarProgresso()">
+    </div>
+
+    <div class="question-card qc1 d2">
+      <span class="q-tag">Questão 1</span>
+      <div class="q-text">O que são coordenadas geográficas?</div>
+      <div class="option" onclick="sel(this,'q1','A')"><div class="option-letter">A</div><div class="option-text">Linhas imaginárias que dividem o mapa em países</div></div>
+      <div class="option" onclick="sel(this,'q1','B')"><div class="option-letter">B</div><div class="option-text">Sistema de referência formado por paralelos e meridianos que permite localizar qualquer ponto na Terra</div></div>
+      <div class="option" onclick="sel(this,'q1','C')"><div class="option-letter">C</div><div class="option-text">Conjunto de símbolos usados para identificar cidades em um mapa</div></div>
+      <div class="option" onclick="sel(this,'q1','D')"><div class="option-letter">D</div><div class="option-text">Escala numérica que indica a distância entre dois pontos</div></div>
+    </div>
+
+    <div class="question-card qc2 d3">
+      <span class="q-tag">Questão 2</span>
+      <div class="q-text">A linha imaginária que divide a Terra em Hemisfério Norte e Hemisfério Sul é chamada de:</div>
+      <div class="option" onclick="sel(this,'q2','A')"><div class="option-letter">A</div><div class="option-text">Meridiano de Greenwich</div></div>
+      <div class="option" onclick="sel(this,'q2','B')"><div class="option-letter">B</div><div class="option-text">Trópico de Capricórnio</div></div>
+      <div class="option" onclick="sel(this,'q2','C')"><div class="option-letter">C</div><div class="option-text">Equador</div></div>
+      <div class="option" onclick="sel(this,'q2','D')"><div class="option-letter">D</div><div class="option-text">Círculo Polar Ártico</div></div>
+    </div>
+
+    <div class="question-card qc3 d4">
+      <span class="q-tag">Questão 3</span>
+      <div class="q-text">O Brasil está localizado predominantemente em qual hemisfério?</div>
+      <div class="option" onclick="sel(this,'q3','A')"><div class="option-letter">A</div><div class="option-text">Hemisfério Norte e Hemisfério Leste</div></div>
+      <div class="option" onclick="sel(this,'q3','B')"><div class="option-letter">B</div><div class="option-text">Hemisfério Sul e Hemisfério Oeste</div></div>
+      <div class="option" onclick="sel(this,'q3','C')"><div class="option-letter">C</div><div class="option-text">Hemisfério Norte e Hemisfério Oeste</div></div>
+      <div class="option" onclick="sel(this,'q3','D')"><div class="option-letter">D</div><div class="option-text">Hemisfério Sul e Hemisfério Leste</div></div>
+    </div>
+
+    <div class="question-card qc4 d5">
+      <span class="q-tag">Questão 4</span>
+      <div class="q-text">O que indica a latitude de um lugar?</div>
+      <div class="option" onclick="sel(this,'q4','A')"><div class="option-letter">A</div><div class="option-text">A distância em relação ao Meridiano de Greenwich, medida em graus a leste ou a oeste</div></div>
+      <div class="option" onclick="sel(this,'q4','B')"><div class="option-letter">B</div><div class="option-text">A altitude de um ponto em relação ao nível do mar</div></div>
+      <div class="option" onclick="sel(this,'q4','C')"><div class="option-letter">C</div><div class="option-text">A distância em relação ao Equador, medida em graus ao norte ou ao sul</div></div>
+      <div class="option" onclick="sel(this,'q4','D')"><div class="option-letter">D</div><div class="option-text">A velocidade de rotação da Terra em um determinado ponto</div></div>
+    </div>
+
+    <div class="question-card qc5 d6">
+      <span class="q-tag">Questão 5</span>
+      <div class="q-text">Qual é a principal função de um mapa?</div>
+      <div class="option" onclick="sel(this,'q5','A')"><div class="option-letter">A</div><div class="option-text">Decorar ambientes e paredes de sala de aula</div></div>
+      <div class="option" onclick="sel(this,'q5','B')"><div class="option-letter">B</div><div class="option-text">Representar a superfície da Terra ou parte dela, permitindo a localização e o estudo dos espaços geográficos</div></div>
+      <div class="option" onclick="sel(this,'q5','C')"><div class="option-letter">C</div><div class="option-text">Mostrar apenas a divisão política entre países</div></div>
+      <div class="option" onclick="sel(this,'q5','D')"><div class="option-letter">D</div><div class="option-text">Registrar a história das civilizações ao longo do tempo</div></div>
+    </div>
+
+    <div class="d7">
+      <button class="btn-enviar" id="btnEnviar" onclick="enviar()">Enviar atividade 🚀</button>
+      <div class="msg-erro" id="msgErro"></div>
+    </div>
+  </div>
+
+  <div id="tela-resultado">
+    <div class="resultado-header">
+      <span class="resultado-emoji" id="res-emoji">🎉</span>
+      <div class="resultado-titulo" id="res-titulo"></div>
+      <div class="resultado-sub" id="res-sub"></div>
+    </div>
+    <div class="resultado-card">
+      <div class="acertos-circle" id="acertos-circle">
+        <div class="acertos-num" id="acertos-num"></div>
+        <div class="acertos-label">de 5 acertos</div>
+      </div>
+      <div style="font-size:22px;font-weight:800;color:#1a1a1a" id="res-pct"></div>
+      <div style="font-size:13px;color:#6b7280;margin-top:4px" id="res-info"></div>
+      <div class="gabarito-lista" id="gabarito-lista"></div>
+    </div>
+    <button class="btn-refazer" onclick="location.reload()">↩ Refazer a atividade</button>
+  </div>
+
+</div>
+<script>
+  const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbyiCArjavmt278IUUFuk_QNt81qeqQU_hcDOeY2i3iX301gTBL7jEYV0NZjVFwDZYIPkQ/exec";
+  const GABARITO = {q1:'B',q2:'C',q3:'B',q4:'C',q5:'B'};
+  const respostas = {q1:null,q2:null,q3:null,q4:null,q5:null};
+
+  function sel(el, q, v) {
+    el.parentElement.querySelectorAll('.option').forEach(o => o.classList.remove('sel'));
+    el.classList.add('sel');
+    respostas[q] = v;
+    atualizarProgresso();
+  }
+
+  function atualizarProgresso() {
+    const n = Object.values(respostas).filter(v => v !== null).length;
+    document.getElementById('progress-bar').style.width = (n/5*100)+'%';
+    document.getElementById('progress-label').textContent = n+' de 5 respondidas';
+  }
+
+  function enviar() {
+    const nome = document.getElementById('nome').value.trim();
+    if (!nome) { mostrarErro('⚠️ Informe seu nome antes de enviar!'); return; }
+    const faltam = Object.values(respostas).filter(v=>v===null).length;
+    if (faltam > 0) { mostrarErro('⚠️ Ainda faltam '+faltam+' questão(ões) sem resposta!'); return; }
+    const btn = document.getElementById('btnEnviar');
+    btn.disabled = true;
+    btn.innerHTML = '<span class="loading-dots"><span></span><span></span><span></span></span>';
+    const dados = {nome, horario: new Date().toLocaleString('pt-BR'), ...respostas};
+    fetch(SCRIPT_URL, {method:'POST', body: JSON.stringify(dados)})
+      .then(r=>r.json()).catch(()=>({}))
+      .finally(() => mostrarResultado(nome));
+  }
+
+  function mostrarErro(msg) {
+    const el = document.getElementById('msgErro');
+    el.textContent = msg; el.style.display = 'block';
+    setTimeout(()=>el.style.display='none', 3500);
+  }
+
+  function mostrarResultado(nome) {
+    let acertos = 0;
+    const itens = [];
+    for (const q in GABARITO) {
+      const ok = respostas[q] === GABARITO[q];
+      if (ok) acertos++;
+      itens.push({q, ok, resp: respostas[q], gab: GABARITO[q]});
+    }
+    const pct = Math.round(acertos/5*100);
+    const primeiro = nome.split(' ')[0];
+    let emoji, titulo, bg;
+    if (acertos===5) { emoji='🏆'; titulo='Perfeito, '+primeiro+'!'; bg='linear-gradient(135deg,#16a34a,#4ade80)'; }
+    else if (acertos>=3) { emoji='🎉'; titulo='Muito bem, '+primeiro+'!'; bg='linear-gradient(135deg,#2563eb,#60a5fa)'; }
+    else { emoji='📚'; titulo='Continue estudando, '+primeiro+'!'; bg='linear-gradient(135deg,#dc2626,#f87171)'; }
+
+    document.getElementById('res-emoji').textContent = emoji;
+    document.getElementById('res-titulo').textContent = titulo;
+    document.getElementById('res-sub').textContent = 'Suas respostas foram registradas!';
+    document.getElementById('acertos-num').textContent = acertos;
+    const circ = document.getElementById('acertos-circle');
+    circ.style.background = bg; circ.style.color = 'white';
+    document.getElementById('res-pct').textContent = pct+'% de aproveitamento';
+    document.getElementById('res-info').textContent = nome+' · '+new Date().toLocaleString('pt-BR');
+
+    const lista = document.getElementById('gabarito-lista');
+    lista.innerHTML = '<div class="gabarito-titulo">Gabarito</div>';
+    itens.forEach((item,i) => {
+      const d = document.createElement('div');
+      d.className = 'gabarito-item '+(item.ok?'acerto':'erro');
+      d.innerHTML = `<span>${item.ok?'✅':'❌'}</span><span>Questão ${i+1}</span><span class="gabarito-resp">Sua resposta: <strong>${item.resp}</strong>${!item.ok?' · Correta: <strong>'+item.gab+'</strong>':''}</span>`;
+      lista.appendChild(d);
+    });
+
+    document.getElementById('tela-atividade').style.display = 'none';
+    document.getElementById('tela-resultado').style.display = 'block';
+    if (acertos >= 3) confetes();
+  }
+
+  function confetes() {
+    const cores = ['#6366f1','#ec4899','#14b8a6','#f97316','#8b5cf6','#4ade80','#facc15'];
+    for (let i=0;i<60;i++) setTimeout(()=>{
+      const c = document.createElement('div');
+      c.className = 'confetti-piece';
+      c.style.cssText = `left:${Math.random()*100}vw;background:${cores[~~(Math.random()*cores.length)]};width:${6+Math.random()*8}px;height:${6+Math.random()*8}px;animation-duration:${2+Math.random()*2}s;animation-delay:${Math.random()*0.5}s;border-radius:${Math.random()>.5?'50%':'2px'};`;
+      document.body.appendChild(c);
+      setTimeout(()=>c.remove(),4500);
+    }, i*40);
+  }
+</script>
+</body>
+</html>
