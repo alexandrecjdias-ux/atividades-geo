@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GeoAventura — Regionalização 7º Ano</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap');
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Nunito',sans-serif;background:#0f172a;min-height:100vh;display:flex;align-items:flex-start;justify-content:center;padding:1.5rem 1rem 3rem}
+  .container{max-width:560px;width:100%}
+  #tela-inicio{text-align:center;animation:fadeIn 0.5s ease}
+  .logo{font-size:72px;margin-bottom:12px;display:block}
+  .game-title{font-size:26px;font-weight:900;color:white;margin-bottom:4px}
+  .game-disc{font-size:13px;font-weight:700;color:#6366f1;margin-bottom:4px;text-transform:uppercase;letter-spacing:0.5px}
+  .game-sub{font-size:14px;color:#94a3b8;margin-bottom:1.5rem}
+  .info-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:1.25rem}
+  .info-box{background:#1e293b;border-radius:14px;padding:14px 10px;text-align:center}
+  .info-icon{font-size:22px;display:block;margin-bottom:4px}
+  .info-label{font-size:11px;color:#64748b;display:block}
+  .info-val{font-size:14px;font-weight:800;color:white;display:block;margin-top:2px}
+  .form-wrap{background:#1e293b;border-radius:16px;padding:1.25rem;margin-bottom:1rem;text-align:left}
+  .form-lbl{font-size:12px;font-weight:800;color:#94a3b8;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;display:block}
+  .form-inp{width:100%;padding:12px 14px;background:#0f172a;border:2px solid #334155;border-radius:12px;font-family:'Nunito',sans-serif;font-size:15px;font-weight:700;color:white;outline:none;transition:border 0.2s;margin-bottom:12px}
+  .form-inp::placeholder{color:#475569}
+  .form-inp:focus{border-color:#6366f1}
+  .form-select{width:100%;padding:12px 14px;background:#0f172a;border:2px solid #334155;border-radius:12px;font-family:'Nunito',sans-serif;font-size:15px;font-weight:700;color:white;outline:none;transition:border 0.2s;appearance:none;cursor:pointer}
+  .form-select:focus{border-color:#6366f1}
+  .btn-start{width:100%;padding:16px;font-family:'Nunito',sans-serif;font-size:18px;font-weight:900;color:white;background:linear-gradient(135deg,#6366f1,#8b5cf6);border:none;border-radius:16px;cursor:pointer;transition:all 0.2s;box-shadow:0 6px 24px rgba(99,102,241,0.5)}
+  .btn-start:hover{transform:translateY(-2px)}
+  #hud{display:none;background:#1e293b;border-radius:16px;padding:12px 16px;margin-bottom:1rem}
+  .hud-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+  .hud-fase{font-size:13px;font-weight:800;color:#94a3b8}
+  .hud-fase span{color:white}
+  .hud-pontos{font-size:13px;font-weight:800;color:#fbbf24}
+  .vidas{display:flex;gap:5px}
+  .vida{font-size:20px;transition:all 0.3s}
+  .vida.perdida{filter:grayscale(1);opacity:0.25;transform:scale(0.8)}
+  .progress-wrap{background:#0f172a;border-radius:20px;height:6px;overflow:hidden}
+  .progress-fill{height:100%;background:linear-gradient(90deg,#6366f1,#8b5cf6);border-radius:20px;transition:width 0.5s ease}
+  #tela-fase{display:none}
+  .fase-badge{display:inline-flex;align-items:center;gap:6px;background:#1e293b;border-radius:20px;padding:6px 14px;font-size:13px;font-weight:800;color:#a78bfa;margin-bottom:14px}
+  .fase-num-badge{background:#6366f1;color:white;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900}
+  .pergunta-card{background:#1e293b;border-radius:20px;padding:1.5rem;margin-bottom:1rem;border-top:4px solid var(--cor)}
+  .pergunta-emoji{font-size:34px;display:block;margin-bottom:10px}
+  .pergunta-texto{font-size:16px;font-weight:800;color:white;line-height:1.5}
+  .opcoes{display:flex;flex-direction:column;gap:10px}
+  .opcao{display:flex;align-items:flex-start;gap:12px;padding:13px 15px;background:#1e293b;border:2px solid #334155;border-radius:14px;cursor:pointer;transition:all 0.2s}
+  .opcao:hover{border-color:#6366f1;transform:translateX(4px)}
+  .opcao-letra{width:30px;height:30px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;background:#0f172a;color:#64748b;flex-shrink:0;transition:all 0.2s;margin-top:1px}
+  .opcao-texto{font-size:14px;font-weight:700;color:#cbd5e1;line-height:1.4}
+  .opcao.correta{border-color:#4ade80!important;background:#052e16!important;pointer-events:none}
+  .opcao.correta .opcao-letra{background:#4ade80;color:#052e16}
+  .opcao.correta .opcao-texto{color:#4ade80}
+  .opcao.errada{border-color:#f87171!important;background:#2d0a0a!important;pointer-events:none}
+  .opcao.errada .opcao-letra{background:#f87171;color:#2d0a0a}
+  .opcao.errada .opcao-texto{color:#f87171}
+  .opcao.bloqueada{pointer-events:none;opacity:0.35}
+  .feedback{border-radius:14px;padding:14px 16px;margin-top:10px;font-size:14px;font-weight:700;line-height:1.5;display:none;animation:fadeIn 0.3s ease}
+  .feedback.ok{background:#052e16;color:#4ade80;border:2px solid #166534}
+  .feedback.err{background:#2d0a0a;color:#f87171;border:2px solid #991b1b}
+  .btn-prox{width:100%;padding:14px;font-family:'Nunito',sans-serif;font-size:16px;font-weight:800;color:white;background:linear-gradient(135deg,#6366f1,#8b5cf6);border:none;border-radius:14px;cursor:pointer;transition:all 0.2s;margin-top:12px;display:none;box-shadow:0 4px 16px rgba(99,102,241,0.4)}
+  .btn-prox:hover{transform:translateY(-2px)}
+  #tela-resultado{display:none;animation:fadeIn 0.5s ease;text-align:center}
+  .res-emoji{font-size:72px;display:block;margin-bottom:12px;animation:bounce 0.8s ease}
+  .res-titulo{font-size:26px;font-weight:900;color:white;margin-bottom:6px}
+  .res-sub{font-size:14px;color:#94a3b8;margin-bottom:1.5rem}
+  .res-card{background:#1e293b;border-radius:20px;padding:1.5rem;margin-bottom:1rem}
+  .stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:1rem}
+  .stat-box{background:#0f172a;border-radius:14px;padding:14px;text-align:center}
+  .stat-val{font-size:30px;font-weight:900;color:white;display:block}
+  .stat-lbl{font-size:12px;color:#64748b;display:block;margin-top:2px}
+  .recap-titulo{font-size:12px;font-weight:800;color:#475569;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px;text-align:left}
+  .recap-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .recap-item{display:flex;align-items:center;gap:8px;padding:9px 12px;border-radius:12px;font-size:13px;font-weight:700}
+  .recap-item.ok{background:#052e16;color:#4ade80}
+  .recap-item.err{background:#2d0a0a;color:#f87171}
+  .btn-jogar-de-novo{width:100%;padding:14px;font-family:'Nunito',sans-serif;font-size:15px;font-weight:800;color:#94a3b8;background:#1e293b;border:2px solid #334155;border-radius:14px;cursor:pointer;transition:all 0.2s;margin-top:0.5rem}
+  .btn-jogar-de-novo:hover{border-color:#6366f1;color:white}
+  .enviando-msg{font-size:13px;color:#64748b;margin-top:10px;text-align:center}
+  .confetti-piece{position:fixed;top:-10px;pointer-events:none;animation:confettiFall linear forwards}
+  @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+  @keyframes bounce{0%,100%{transform:scale(1)}40%{transform:scale(1.2)}70%{transform:scale(0.9)}}
+  @keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-8px)}40%,80%{transform:translateX(8px)}}
+  @keyframes confettiFall{0%{transform:translateY(0) rotate(0deg);opacity:1}100%{transform:translateY(100vh) rotate(720deg);opacity:0}}
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div id="tela-inicio">
+    <span class="logo">🗺️</span>
+    <div class="game-disc">Geografia · 7º Ano</div>
+    <div class="game-title">GeoAventura</div>
+    <div class="game-sub">Regionalização do Território Brasileiro</div>
+    <div class="info-grid">
+      <div class="info-box"><span class="info-icon">🎯</span><span class="info-label">Fases</span><span class="info-val">10</span></div>
+      <div class="info-box"><span class="info-icon">❤️</span><span class="info-label">Vidas</span><span class="info-val">5</span></div>
+      <div class="info-box"><span class="info-icon">⭐</span><span class="info-label">Pontos</span><span class="info-val">até 1000</span></div>
+    </div>
+    <div class="form-wrap">
+      <span class="form-lbl">👤 Seu nome completo</span>
+      <input class="form-inp" id="nome" type="text" placeholder="Digite seu nome...">
+      <span class="form-lbl">🏫 Sua turma</span>
+      <select class="form-select" id="turma">
+        <option value="">— Selecione sua turma —</option>
+        <option value="7º Ano A">7º Ano A</option>
+        <option value="7º Ano B">7º Ano B</option>
+        <option value="7º Ano C">7º Ano C</option>
+        <option value="7º Ano D">7º Ano D</option>
+      </select>
+    </div>
+    <button class="btn-start" onclick="iniciar()">🚀 Começar o jogo!</button>
+  </div>
+
+  <div id="hud">
+    <div class="hud-row">
+      <div class="hud-fase">Fase <span id="hud-fase-num">1</span>/10</div>
+      <div class="hud-pontos">⭐ <span id="hud-pontos">0</span> pts</div>
+      <div class="vidas" id="vidas-display">
+        <span class="vida">❤️</span><span class="vida">❤️</span><span class="vida">❤️</span><span class="vida">❤️</span><span class="vida">❤️</span>
+      </div>
+    </div>
+    <div class="progress-wrap"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+  </div>
+
+  <div id="tela-fase"></div>
+  <div id="tela-resultado"></div>
+
+</div>
+<script>
+const SCRIPT_URL="https://script.google.com/macros/s/AKfycbydyp0t_TVhzz-ZJRoeO47qBccV7hDekbmUP1PFLoVpPtBiiGLwXFtSEKzzfYBklJ54/exec";
+
+const FASES=[
+  {
+    cor:'#6366f1',emoji:'🌎',
+    pergunta:'O que é regionalização?',
+    opcoes:[
+      'A divisão de um território em partes com base em certos critérios ou princípios',
+      'O estudo das características climáticas de um país',
+      'A contagem da população de cada estado brasileiro',
+      'O processo de industrialização das regiões mais pobres do país'
+    ],
+    correta:0,
+    explicacao:'✅ Isso mesmo! Regionalização é a divisão de um território em partes com base em critérios que podem ser naturais (clima, relevo) ou humanos (economia, cultura). A escolha dos critérios revela intenções de quem divide.'
+  },
+  {
+    cor:'#ec4899',emoji:'🏛️',
+    pergunta:'Qual órgão do governo brasileiro dividiu o território em 5 Grandes Regiões, e em que ano essa divisão foi adotada?',
+    opcoes:[
+      'Ministério da Educação, em 1964',
+      'IBGE (Instituto Brasileiro de Geografia e Estatística), em 1988',
+      'IPEA (Instituto de Pesquisa Econômica Aplicada), em 1975',
+      'FUNAI (Fundação Nacional dos Povos Indígenas), em 2000'
+    ],
+    correta:1,
+    explicacao:'✅ Correto! O IBGE adotou a divisão em 5 Grandes Regiões (ou Macrorregiões) em 1988. Os limites coincidem com as divisas dos estados para facilitar os estudos estatísticos oficiais.'
+  },
+  {
+    cor:'#14b8a6',emoji:'🇧🇷',
+    pergunta:'A Bahia — estado onde fica Vitória da Conquista — pertence a qual das 5 Grandes Regiões do IBGE?',
+    opcoes:[
+      'Região Sudeste',
+      'Região Centro-Oeste',
+      'Região Norte',
+      'Região Nordeste'
+    ],
+    correta:3,
+    explicacao:'✅ Exato! A Bahia pertence à Região Nordeste, que é composta por 9 estados e é a única região que inclui tanto o semiárido quanto um extenso litoral. A Bahia é o maior estado do Nordeste.'
+  },
+  {
+    cor:'#f97316',emoji:'🏙️',
+    pergunta:'Qual Grande Região do IBGE é a mais populosa e industrializada do Brasil, com o maior PIB do país?',
+    opcoes:[
+      'Região Norte',
+      'Região Sul',
+      'Região Sudeste',
+      'Região Centro-Oeste'
+    ],
+    correta:2,
+    explicacao:'✅ Muito bem! A Região Sudeste, formada por São Paulo, Rio de Janeiro, Minas Gerais e Espírito Santo, concentra a maior população, o maior parque industrial e o maior PIB do Brasil.'
+  },
+  {
+    cor:'#8b5cf6',emoji:'🌆',
+    pergunta:'O que são Regiões de Influência Urbana?',
+    opcoes:[
+      'Regiões onde há mais de 1 milhão de habitantes concentrados em uma única cidade',
+      'Divisões baseadas nos centros urbanos que exercem influência sobre cidades menores ao redor, por oferecerem serviços diversificados',
+      'Áreas que recebem investimentos federais para desenvolvimento industrial',
+      'Regiões definidas pelo número de municípios que possuem universidades federais'
+    ],
+    correta:1,
+    explicacao:'✅ Correto! As Regiões de Influência Urbana são definidas pelos fluxos de pessoas em busca de serviços — saúde, educação, comércio — que sua cidade não oferece. Vitória da Conquista é um exemplo: exerce influência sobre dezenas de municípios do entorno.'
+  },
+  {
+    cor:'#3b82f6',emoji:'📊',
+    pergunta:'O geógrafo Pedro Pinchas Geiger propôs, em 1967, a divisão do Brasil em Complexos Regionais. Qual critério ele utilizou?',
+    opcoes:[
+      'Critério climático — tipos de clima de cada região',
+      'Critério político — número de deputados federais por estado',
+      'Critério econômico — características econômicas dos espaços geográficos',
+      'Critério demográfico — densidade populacional de cada área'
+    ],
+    correta:2,
+    explicacao:'✅ Isso mesmo! Geiger utilizou o critério econômico para dividir o Brasil em 3 Complexos Regionais (ou Macrorregiões Geoeconômicas): Amazônia, Nordeste e Centro-Sul. Uma diferença importante: essa divisão não respeita os limites dos estados.'
+  },
+  {
+    cor:'#f59e0b',emoji:'🌿',
+    pergunta:'Quais são os 3 Complexos Regionais propostos por Geiger?',
+    opcoes:[
+      'Norte, Centro e Sul',
+      'Amazônia, Nordeste e Centro-Sul',
+      'Litoral, Sertão e Planalto',
+      'Amazônia, Cerrado e Mata Atlântica'
+    ],
+    correta:1,
+    explicacao:'✅ Exato! Os 3 Complexos Regionais de Geiger são: Amazônia (extrativismo, baixa densidade), Nordeste (desigualdades, semiárido) e Centro-Sul (maior concentração industrial e econômica do país).'
+  },
+  {
+    cor:'#10b981',emoji:'💻',
+    pergunta:'O geógrafo Milton Santos — nascido na Bahia — propôs uma regionalização baseada no meio técnico-científico-informacional. O que esse critério analisa?',
+    opcoes:[
+      'A extensão territorial e o número de municípios de cada região',
+      'A densidade de recursos técnicos e informacionais, como redes de transporte, telecomunicações e tecnologia aplicada à economia',
+      'O número de universidades federais e institutos de pesquisa de cada estado',
+      'A quantidade de indústrias instaladas em cada região do país'
+    ],
+    correta:1,
+    explicacao:'✅ Correto! Milton Santos analisou a densidade de recursos técnicos e informacionais: redes de transporte, telecomunicações, internet, sistemas computadorizados etc. Quanto mais desses recursos, maior a integração econômica da região.'
+  },
+  {
+    cor:'#e11d48',emoji:'🏭',
+    pergunta:'Na proposta de Milton Santos, as Regiões Sul e Sudeste do IBGE se uniram em uma única região. Como ela é chamada?',
+    opcoes:[
+      'Região Integrada',
+      'Região Desenvolvida',
+      'Região Concentrada',
+      'Região Industrial'
+    ],
+    correta:2,
+    explicacao:'✅ Muito bem! A Região Concentrada reúne Sul e Sudeste em uma só região por apresentar alta densidade de meios técnicos e forte integração econômica — a maior concentração industrial, tecnológica e de serviços do Brasil.'
+  },
+  {
+    cor:'#7c3aed',emoji:'📋',
+    pergunta:'Qual das afirmações abaixo compara corretamente as três propostas de regionalização estudadas?',
+    opcoes:[
+      'As três propostas respeitam os limites dos estados e utilizam critérios econômicos',
+      'Apenas a divisão do IBGE respeita os limites dos estados; as de Geiger e Milton Santos não seguem essas divisas',
+      'A divisão do IBGE tem 3 regiões; a de Geiger tem 5; a de Milton Santos tem 4',
+      'As três propostas chegam à mesma divisão territorial, apenas com nomes diferentes'
+    ],
+    correta:1,
+    explicacao:'✅ Perfeito! O IBGE respeita as divisas estaduais (para fins estatísticos). Já Geiger e Milton Santos utilizam critérios econômicos e técnicos que cruzam os limites dos estados — por isso suas divisões são diferentes e mais flexíveis.'
+  }
+];
+
+const TOTAL=FASES.length;
+let nomeJogador='',turmaJogador='',faseAtual=0,vidas=5,pontos=0,acertos=0,historico=[],respondeu=false;
+
+function iniciar(){
+  nomeJogador=document.getElementById('nome').value.trim();
+  turmaJogador=document.getElementById('turma').value;
+  if(!nomeJogador){document.getElementById('nome').style.borderColor='#f87171';setTimeout(()=>document.getElementById('nome').style.borderColor='#334155',1500);return;}
+  if(!turmaJogador){document.getElementById('turma').style.borderColor='#f87171';setTimeout(()=>document.getElementById('turma').style.borderColor='#334155',1500);return;}
+  document.getElementById('tela-inicio').style.display='none';
+  document.getElementById('hud').style.display='block';
+  carregarFase();
+}
+
+function carregarFase(){
+  respondeu=false;
+  const fase=FASES[faseAtual];
+  document.getElementById('hud-fase-num').textContent=faseAtual+1;
+  document.getElementById('hud-pontos').textContent=pontos;
+  document.getElementById('progress-fill').style.width=(faseAtual/TOTAL*100)+'%';
+  atualizarVidas();
+  const opHTML=fase.opcoes.map((op,i)=>`<div class="opcao" onclick="responder(${i})" id="op-${i}"><div class="opcao-letra">${['A','B','C','D'][i]}</div><div class="opcao-texto">${op}</div></div>`).join('');
+  document.getElementById('tela-fase').style.display='block';
+  document.getElementById('tela-fase').innerHTML=`<div style="animation:fadeUp 0.4s ease"><div class="fase-badge"><div class="fase-num-badge">${faseAtual+1}</div>Fase ${faseAtual+1} de ${TOTAL}</div><div class="pergunta-card" style="--cor:${fase.cor}"><span class="pergunta-emoji">${fase.emoji}</span><div class="pergunta-texto">${fase.pergunta}</div></div><div class="opcoes">${opHTML}</div><div class="feedback" id="feedback"></div><button class="btn-prox" id="btn-prox" onclick="proximaFase()">Próxima fase →</button></div>`;
+}
+
+function responder(idx){
+  if(respondeu)return;
+  respondeu=true;
+  const fase=FASES[faseAtual];
+  const acertou=idx===fase.correta;
+  const fb=document.getElementById('feedback');
+  document.querySelectorAll('.opcao').forEach((el,i)=>{if(i===fase.correta)el.classList.add('correta');else if(i===idx&&!acertou)el.classList.add('errada');else el.classList.add('bloqueada');});
+  if(acertou){pontos+=100;acertos++;historico.push({fase:faseAtual+1,ok:true});fb.className='feedback ok';fb.textContent=fase.explicacao;}
+  else{vidas--;historico.push({fase:faseAtual+1,ok:false});atualizarVidas();fb.className='feedback err';fb.textContent='❌ Errou! A resposta correta era a opção '+['A','B','C','D'][fase.correta]+'. '+fase.explicacao.replace('✅','💡');if(document.getElementById('tela-fase')){document.getElementById('tela-fase').style.animation='shake 0.4s ease';setTimeout(()=>{if(document.getElementById('tela-fase'))document.getElementById('tela-fase').style.animation='';},400);}}
+  fb.style.display='block';
+  document.getElementById('hud-pontos').textContent=pontos;
+  const btn=document.getElementById('btn-prox');btn.style.display='block';
+  if(vidas===0){btn.textContent='💔 Ver resultado →';btn.onclick=()=>encerrar(false);}
+  else if(faseAtual===TOTAL-1){btn.textContent='🏆 Ver resultado!';btn.onclick=()=>encerrar(true);}
+}
+
+function proximaFase(){faseAtual++;if(faseAtual>=TOTAL||vidas===0)encerrar(faseAtual>=TOTAL&&vidas>0);else carregarFase();}
+function atualizarVidas(){document.querySelectorAll('.vida').forEach((v,i)=>v.classList.toggle('perdida',i>=vidas));}
+
+function encerrar(venceu){
+  document.getElementById('tela-fase').style.display='none';
+  document.getElementById('progress-fill').style.width='100%';
+  const pct=Math.round(acertos/TOTAL*100);
+  const primeiro=nomeJogador.split(' ')[0];
+  let emoji,titulo,sub;
+  if(acertos===TOTAL){emoji='🏆';titulo='Perfeito, '+primeiro+'!';sub='Você acertou todas as 10 fases!';}
+  else if(acertos>=7){emoji='🎉';titulo='Muito bem, '+primeiro+'!';sub='Ótimo desempenho em Regionalização!';}
+  else if(acertos>=5){emoji='👍';titulo='Bom trabalho, '+primeiro+'!';sub='Continue estudando para melhorar!';}
+  else if(vidas===0){emoji='💔';titulo='Fim de jogo, '+primeiro+'!';sub='Você perdeu todas as vidas. Tente de novo!';}
+  else{emoji='📚';titulo='Continue estudando, '+primeiro+'!';sub='Revise o conteúdo e tente novamente!';}
+  const recapHTML=historico.map(h=>`<div class="recap-item ${h.ok?'ok':'err'}"><span>${h.ok?'✅':'❌'}</span><span>Fase ${h.fase} ${h.ok?'· +100 pts':'· −1 vida'}</span></div>`).join('');
+  document.getElementById('tela-resultado').style.display='block';
+  document.getElementById('tela-resultado').innerHTML=`<span class="res-emoji">${emoji}</span><div class="res-titulo">${titulo}</div><div class="res-sub">${sub}</div><div class="res-card"><div class="stats-grid"><div class="stat-box"><span class="stat-val">${acertos}/${TOTAL}</span><span class="stat-lbl">Acertos</span></div><div class="stat-box"><span class="stat-val">${pontos}</span><span class="stat-lbl">Pontos</span></div><div class="stat-box"><span class="stat-val">${pct}%</span><span class="stat-lbl">Aproveitamento</span></div><div class="stat-box"><span class="stat-val">${Math.max(vidas,0)}❤️</span><span class="stat-lbl">Vidas restantes</span></div></div><div class="recap-titulo">Histórico de fases</div><div class="recap-grid">${recapHTML}</div></div><button class="btn-jogar-de-novo" onclick="location.reload()">↩ Jogar de novo</button><p class="enviando-msg" id="enviando-msg">Enviando resultado para a planilha...</p>`;
+  if(acertos>=5)confetes();
+  enviarResultado(pct);
+}
+
+function enviarResultado(pct){
+  const dados={nome:nomeJogador,turma:turmaJogador,horario:new Date().toLocaleString('pt-BR'),acertos:acertos+'/'+TOTAL,pontos,aproveitamento:pct+'%',vidas_restantes:Math.max(vidas,0),status:vidas===0?'Game Over':(acertos===TOTAL?'Completo — Perfeito!':'Completo')};
+  fetch(SCRIPT_URL,{method:'POST',body:JSON.stringify(dados)}).then(()=>{const el=document.getElementById('enviando-msg');if(el)el.textContent='✅ Resultado registrado na planilha!';}).catch(()=>{const el=document.getElementById('enviando-msg');if(el)el.textContent='';});
+}
+
+function confetes(){
+  const cores=['#6366f1','#ec4899','#14b8a6','#f97316','#8b5cf6','#4ade80','#facc15','#3b82f6'];
+  for(let i=0;i<80;i++)setTimeout(()=>{const c=document.createElement('div');c.className='confetti-piece';c.style.cssText=`left:${Math.random()*100}vw;background:${cores[~~(Math.random()*cores.length)]};width:${6+Math.random()*8}px;height:${6+Math.random()*8}px;animation-duration:${2+Math.random()*2.5}s;animation-delay:${Math.random()*0.8}s;border-radius:${Math.random()>.5?'50%':'2px'};`;document.body.appendChild(c);setTimeout(()=>c.remove(),5500);},i*30);
+}
+</script>
+</body>
+</html>
