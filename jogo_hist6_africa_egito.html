@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HistóriaAventura — África e Egito 6º Ano</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap');
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:'Nunito',sans-serif;background:#0f172a;min-height:100vh;display:flex;align-items:flex-start;justify-content:center;padding:1.5rem 1rem 3rem}
+  .container{max-width:560px;width:100%}
+  #tela-inicio{text-align:center;animation:fadeIn 0.5s ease}
+  .logo{font-size:72px;margin-bottom:12px;display:block}
+  .game-title{font-size:26px;font-weight:900;color:white;margin-bottom:4px}
+  .game-disc{font-size:13px;font-weight:700;color:#f97316;margin-bottom:4px;text-transform:uppercase;letter-spacing:0.5px}
+  .game-sub{font-size:14px;color:#94a3b8;margin-bottom:1.5rem}
+  .info-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:1.25rem}
+  .info-box{background:#1e293b;border-radius:14px;padding:14px 10px;text-align:center}
+  .info-icon{font-size:22px;display:block;margin-bottom:4px}
+  .info-label{font-size:11px;color:#64748b;display:block}
+  .info-val{font-size:14px;font-weight:800;color:white;display:block;margin-top:2px}
+  .form-wrap{background:#1e293b;border-radius:16px;padding:1.25rem;margin-bottom:1rem;text-align:left}
+  .form-lbl{font-size:12px;font-weight:800;color:#94a3b8;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:8px;display:block}
+  .form-inp{width:100%;padding:12px 14px;background:#0f172a;border:2px solid #334155;border-radius:12px;font-family:'Nunito',sans-serif;font-size:15px;font-weight:700;color:white;outline:none;transition:border 0.2s;margin-bottom:12px}
+  .form-inp::placeholder{color:#475569}
+  .form-inp:focus{border-color:#f97316}
+  .form-select{width:100%;padding:12px 14px;background:#0f172a;border:2px solid #334155;border-radius:12px;font-family:'Nunito',sans-serif;font-size:15px;font-weight:700;color:white;outline:none;transition:border 0.2s;appearance:none;cursor:pointer}
+  .form-select:focus{border-color:#f97316}
+  .btn-start{width:100%;padding:16px;font-family:'Nunito',sans-serif;font-size:18px;font-weight:900;color:white;background:linear-gradient(135deg,#f97316,#dc2626);border:none;border-radius:16px;cursor:pointer;transition:all 0.2s;box-shadow:0 6px 24px rgba(249,115,22,0.5)}
+  .btn-start:hover{transform:translateY(-2px)}
+  #hud{display:none;background:#1e293b;border-radius:16px;padding:12px 16px;margin-bottom:1rem}
+  .hud-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+  .hud-fase{font-size:13px;font-weight:800;color:#94a3b8}
+  .hud-fase span{color:white}
+  .hud-pontos{font-size:13px;font-weight:800;color:#fbbf24}
+  .vidas{display:flex;gap:5px}
+  .vida{font-size:20px;transition:all 0.3s}
+  .vida.perdida{filter:grayscale(1);opacity:0.25;transform:scale(0.8)}
+  .progress-wrap{background:#0f172a;border-radius:20px;height:6px;overflow:hidden}
+  .progress-fill{height:100%;background:linear-gradient(90deg,#f97316,#dc2626);border-radius:20px;transition:width 0.5s ease}
+  #tela-fase{display:none}
+  .fase-badge{display:inline-flex;align-items:center;gap:6px;background:#1e293b;border-radius:20px;padding:6px 14px;font-size:13px;font-weight:800;color:#fb923c;margin-bottom:14px}
+  .fase-num-badge{background:#f97316;color:white;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900}
+  .pergunta-card{background:#1e293b;border-radius:20px;padding:1.5rem;margin-bottom:1rem;border-top:4px solid var(--cor)}
+  .pergunta-emoji{font-size:34px;display:block;margin-bottom:10px}
+  .pergunta-texto{font-size:16px;font-weight:800;color:white;line-height:1.5}
+  .opcoes{display:flex;flex-direction:column;gap:10px}
+  .opcao{display:flex;align-items:flex-start;gap:12px;padding:13px 15px;background:#1e293b;border:2px solid #334155;border-radius:14px;cursor:pointer;transition:all 0.2s}
+  .opcao:hover{border-color:#f97316;transform:translateX(4px)}
+  .opcao-letra{width:30px;height:30px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:900;background:#0f172a;color:#64748b;flex-shrink:0;transition:all 0.2s;margin-top:1px}
+  .opcao-texto{font-size:14px;font-weight:700;color:#cbd5e1;line-height:1.4}
+  .opcao.correta{border-color:#4ade80!important;background:#052e16!important;pointer-events:none}
+  .opcao.correta .opcao-letra{background:#4ade80;color:#052e16}
+  .opcao.correta .opcao-texto{color:#4ade80}
+  .opcao.errada{border-color:#f87171!important;background:#2d0a0a!important;pointer-events:none}
+  .opcao.errada .opcao-letra{background:#f87171;color:#2d0a0a}
+  .opcao.errada .opcao-texto{color:#f87171}
+  .opcao.bloqueada{pointer-events:none;opacity:0.35}
+  .feedback{border-radius:14px;padding:14px 16px;margin-top:10px;font-size:14px;font-weight:700;line-height:1.5;display:none;animation:fadeIn 0.3s ease}
+  .feedback.ok{background:#052e16;color:#4ade80;border:2px solid #166534}
+  .feedback.err{background:#2d0a0a;color:#f87171;border:2px solid #991b1b}
+  .btn-prox{width:100%;padding:14px;font-family:'Nunito',sans-serif;font-size:16px;font-weight:800;color:white;background:linear-gradient(135deg,#f97316,#dc2626);border:none;border-radius:14px;cursor:pointer;transition:all 0.2s;margin-top:12px;display:none;box-shadow:0 4px 16px rgba(249,115,22,0.4)}
+  .btn-prox:hover{transform:translateY(-2px)}
+  #tela-resultado{display:none;animation:fadeIn 0.5s ease;text-align:center}
+  .res-emoji{font-size:72px;display:block;margin-bottom:12px;animation:bounce 0.8s ease}
+  .res-titulo{font-size:26px;font-weight:900;color:white;margin-bottom:6px}
+  .res-sub{font-size:14px;color:#94a3b8;margin-bottom:1.5rem}
+  .res-card{background:#1e293b;border-radius:20px;padding:1.5rem;margin-bottom:1rem}
+  .stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:1rem}
+  .stat-box{background:#0f172a;border-radius:14px;padding:14px;text-align:center}
+  .stat-val{font-size:30px;font-weight:900;color:white;display:block}
+  .stat-lbl{font-size:12px;color:#64748b;display:block;margin-top:2px}
+  .recap-titulo{font-size:12px;font-weight:800;color:#475569;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px;text-align:left}
+  .recap-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+  .recap-item{display:flex;align-items:center;gap:8px;padding:9px 12px;border-radius:12px;font-size:13px;font-weight:700}
+  .recap-item.ok{background:#052e16;color:#4ade80}
+  .recap-item.err{background:#2d0a0a;color:#f87171}
+  .btn-jogar-de-novo{width:100%;padding:14px;font-family:'Nunito',sans-serif;font-size:15px;font-weight:800;color:#94a3b8;background:#1e293b;border:2px solid #334155;border-radius:14px;cursor:pointer;transition:all 0.2s;margin-top:0.5rem}
+  .btn-jogar-de-novo:hover{border-color:#f97316;color:white}
+  .enviando-msg{font-size:13px;color:#64748b;margin-top:10px;text-align:center}
+  .confetti-piece{position:fixed;top:-10px;pointer-events:none;animation:confettiFall linear forwards}
+  @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+  @keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+  @keyframes bounce{0%,100%{transform:scale(1)}40%{transform:scale(1.2)}70%{transform:scale(0.9)}}
+  @keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-8px)}40%,80%{transform:translateX(8px)}}
+  @keyframes confettiFall{0%{transform:translateY(0) rotate(0deg);opacity:1}100%{transform:translateY(100vh) rotate(720deg);opacity:0}}
+</style>
+</head>
+<body>
+<div class="container">
+
+  <div id="tela-inicio">
+    <span class="logo">🏺</span>
+    <div class="game-disc">História · 6º Ano</div>
+    <div class="game-title">HistóriaAventura</div>
+    <div class="game-sub">África: Organizações Políticas e o Império Egípcio</div>
+    <div class="info-grid">
+      <div class="info-box"><span class="info-icon">🎯</span><span class="info-label">Fases</span><span class="info-val">10</span></div>
+      <div class="info-box"><span class="info-icon">❤️</span><span class="info-label">Vidas</span><span class="info-val">5</span></div>
+      <div class="info-box"><span class="info-icon">⭐</span><span class="info-label">Pontos</span><span class="info-val">até 1000</span></div>
+    </div>
+    <div class="form-wrap">
+      <span class="form-lbl">👤 Seu nome completo</span>
+      <input class="form-inp" id="nome" type="text" placeholder="Digite seu nome...">
+      <span class="form-lbl">🏫 Sua turma</span>
+      <select class="form-select" id="turma">
+        <option value="">— Selecione sua turma —</option>
+        <option value="6º Ano A">6º Ano A</option>
+        <option value="6º Ano B">6º Ano B</option>
+        <option value="6º Ano C">6º Ano C</option>
+        <option value="6º Ano D">6º Ano D</option>
+      </select>
+    </div>
+    <button class="btn-start" onclick="iniciar()">🚀 Começar o jogo!</button>
+  </div>
+
+  <div id="hud">
+    <div class="hud-row">
+      <div class="hud-fase">Fase <span id="hud-fase-num">1</span>/10</div>
+      <div class="hud-pontos">⭐ <span id="hud-pontos">0</span> pts</div>
+      <div class="vidas" id="vidas-display">
+        <span class="vida">❤️</span><span class="vida">❤️</span><span class="vida">❤️</span><span class="vida">❤️</span><span class="vida">❤️</span>
+      </div>
+    </div>
+    <div class="progress-wrap"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+  </div>
+
+  <div id="tela-fase"></div>
+  <div id="tela-resultado"></div>
+
+</div>
+<script>
+const SCRIPT_URL="https://script.google.com/macros/s/AKfycbydyp0t_TVhzz-ZJRoeO47qBccV7hDekbmUP1PFLoVpPtBiiGLwXFtSEKzzfYBklJ54/exec";
+
+const FASES=[
+  {
+    cor:'#f97316',emoji:'🌍',
+    pergunta:'Antes da chegada dos europeus, a África tinha formas de organização política? O que as sociedades africanas produziam?',
+    opcoes:[
+      'Não havia organização política — a África era habitada por povos sem estrutura social',
+      'Sim. A África já produzia aldeias, cidades-Estado, reinos e impérios que organizavam a vida de milhões de pessoas',
+      'Havia apenas aldeias pequenas e isoladas, sem comércio ou governo',
+      'A África era organizada politicamente, mas somente em impérios — não havia aldeias nem reinos menores'
+    ],
+    correta:1,
+    explicacao:'✅ Isso mesmo! Longe de ser um continente sem história, a África produzia sociedades complexas muito antes da chegada dos europeus — com aldeias, cidades-Estado, reinos e impérios organizados.'
+  },
+  {
+    cor:'#dc2626',emoji:'🏘️',
+    pergunta:'Qual era o papel do líder em uma aldeia africana?',
+    opcoes:[
+      'Apenas representar a aldeia em guerras, sem participar da distribuição de terras',
+      'Coletar impostos e enviar os recursos para o rei do reino ao qual a aldeia pertencia',
+      'Julgar conflitos, distribuir terras e comandar os guerreiros, auxiliado por um Conselho',
+      'Realizar rituais religiosos exclusivamente, sem exercer funções políticas'
+    ],
+    correta:2,
+    explicacao:'✅ Correto! O líder da aldeia julgava, distribuía terras e comandava os guerreiros em caso de conflito. Era auxiliado por um Conselho. As pessoas se orientavam pelos espíritos da natureza ou de antepassados.'
+  },
+  {
+    cor:'#b45309',emoji:'🏛️',
+    pergunta:'A cidade-Estado de Ifé, na atual Nigéria, é famosa por quê?',
+    opcoes:[
+      'Por ter sido a maior cidade do Egito Antigo',
+      'Pelos Onis — seus governantes — que deixaram esculturas em bronze consideradas obras-primas da arte africana',
+      'Por ter construído as primeiras pirâmides do continente africano',
+      'Por ser a capital do Império Mali, o mais poderoso da África Ocidental'
+    ],
+    correta:1,
+    explicacao:'✅ Exato! Ifé era uma cidade-Estado com governo próprio, centro comercial e área rural. Seus governantes, os Onis, produziram esculturas em bronze que revelam a sofisticação artística e técnica das cidades-Estado africanas.'
+  },
+  {
+    cor:'#7c3aed',emoji:'👑',
+    pergunta:'Qual é a diferença entre Reino e Império na organização política africana?',
+    opcoes:[
+      'Um reino tem mais habitantes que um império; a diferença é apenas quantitativa',
+      'O reino é governado por um conselho de anciãos; o império é sempre governado por um rei estrangeiro',
+      'O reino reúne várias aldeias e cidades sob a autoridade de um rei; o império se forma quando esse líder expande os domínios conquistando outros territórios',
+      'Não há diferença real — reino e império são sinônimos na história africana'
+    ],
+    correta:2,
+    explicacao:'✅ Muito bem! O reino reúne várias aldeias e cidades sob um rei. Quando esse líder expande seus domínios por meio de guerras e conquistas, subordinando outros povos e territórios, está formado um Império.'
+  },
+  {
+    cor:'#0369a1',emoji:'🌊',
+    pergunta:'Como surgiu o Império Egípcio? Qual foi o papel do Rio Nilo nesse processo?',
+    opcoes:[
+      'O Egito surgiu de uma invasão vinda da Mesopotâmia, sem relação com o Rio Nilo',
+      'Disputas por terras férteis às margens do Rio Nilo levaram a guerras e alianças entre chefes, formando os nomos e, depois, dois grandes reinos',
+      'O Rio Nilo dividiu o Egito em dois impérios independentes que nunca se uniram',
+      'O Egito surgiu do comércio no Mar Mediterrâneo, sem relação com disputas internas'
+    ],
+    correta:1,
+    explicacao:'✅ Correto! As terras férteis às margens do Nilo eram disputadas pelos chefes. Com o tempo, os vencedores passaram a governar territórios maiores — os nomos. As disputas entre os nomarcas deram origem ao Alto e ao Baixo Egito.'
+  },
+  {
+    cor:'#0f766e',emoji:'🏺',
+    pergunta:'Quem foi Menés e qual foi sua importância para o Egito Antigo?',
+    opcoes:[
+      'Foi o primeiro nomarca do Alto Egito, que construiu as pirâmides de Gizé',
+      'Foi um faraó do Novo Império, responsável pela expulsão dos hicsos',
+      'Foi o rei do Alto Egito que, por volta de 3100 a.C., conquistou o Baixo Egito, unificando os dois reinos e tornando-se o primeiro faraó',
+      'Foi um administrador do Baixo Egito que fundou a cidade de Mênfis'
+    ],
+    correta:2,
+    explicacao:'✅ Isso mesmo! Por volta de 3100 a.C., Menés unificou o Alto e o Baixo Egito, tornando-se o primeiro faraó e fundador da primeira dinastia egípcia. A capital inicial do Egito unificado foi Tínis, depois substituída por Mênfis.'
+  },
+  {
+    cor:'#166534',emoji:'⚱️',
+    pergunta:'O que era um nomo e qual era a função do nomarca no Império Egípcio?',
+    opcoes:[
+      'O nomo era uma cidade sagrada; o nomarca era o sacerdote responsável pelos rituais religiosos',
+      'O nomo era uma divisão territorial do Egito, semelhante a uma província; o nomarca era seu administrador',
+      'O nomo era o exército egípcio; o nomarca era o general que comandava as tropas',
+      'O nomo era o título do faraó; o nomarca era seu conselheiro pessoal'
+    ],
+    correta:1,
+    explicacao:'✅ Exato! O nomo era uma divisão territorial — seus habitantes adoravam o mesmo deus e seguiam os mesmos ritos. O nomarca administrava o nomo. Quando o faraó era forte, os nomarcas tinham pouca autonomia; nas crises, agiam quase como reis independentes.'
+  },
+  {
+    cor:'#6d28d9',emoji:'🏗️',
+    pergunta:'Quais grandes obras foram construídas durante o Antigo Império Egípcio?',
+    opcoes:[
+      'Os jardins suspensos da Babilônia e o Colosso de Rodes',
+      'As pirâmides de Quéops, Quéfren e Miquerinos e a esfinge de Gizé',
+      'O Partenon de Atenas e o Templo de Artemis em Éfeso',
+      'A Grande Muralha da China e o Coliseu Romano'
+    ],
+    correta:1,
+    explicacao:'✅ Muito bem! O Antigo Império foi um período de estabilidade política e progresso econômico. Com os recursos dos impostos, o faraó financiou grandes obras — entre elas as pirâmides de Quéops, Quéfren e Miquerinos e a esfinge de Gizé.'
+  },
+  {
+    cor:'#b45309',emoji:'⚔️',
+    pergunta:'Quem eram os hicsos e em qual período do Egito eles invadiram o território egípcio?',
+    opcoes:[
+      'Os hicsos eram um povo do sul da África que invadiram o Egito durante o Antigo Império',
+      'Os hicsos eram navegadores gregos que chegaram ao Egito pelo Mar Mediterrâneo durante o Novo Império',
+      'Os hicsos eram um povo da Ásia Central que atravessaram o deserto e invadiram o Egito durante o Médio Império, lá permanecendo por 170 anos',
+      'Os hicsos eram egípcios rebeldes que tentaram destronar o faraó durante o Antigo Império'
+    ],
+    correta:2,
+    explicacao:'✅ Correto! Os hicsos eram originários da Ásia Central. Aproveitando o enfraquecimento do Egito durante o Médio Império, atravessaram o deserto e invadiram o território egípcio, permanecendo por 170 anos até serem expulsos no início do Novo Império.'
+  },
+  {
+    cor:'#dc2626',emoji:'📜',
+    pergunta:'Por que o Império Egípcio entrou em decadência? Quem conquistou o Egito em 525 a.C.?',
+    opcoes:[
+      'O Egito decaiu por causa de uma grande seca no Rio Nilo; foi conquistado pelos gregos em 525 a.C.',
+      'As revoltas sociais internas — causadas pelo empobrecimento da população devido a impostos e gastos militares — somadas às sublevações dos povos conquistados enfraqueceram o Egito, que foi conquistado pelos persas em 525 a.C.',
+      'O Egito decaiu por causa da perda do controle das rotas comerciais; foi conquistado pelos romanos em 525 a.C.',
+      'A decadência se deu pelo enfraquecimento do exército; o Egito foi conquistado pelos núbios em 525 a.C.'
+    ],
+    correta:1,
+    explicacao:'✅ Perfeito! A maioria da população empobreceu por causa dos impostos e dos gastos militares. Isso gerou revoltas internas, somadas às sublevações dos povos conquistados. Enfraquecido, o Egito foi conquistado pelos persas em 525 a.C., encerrando o período do Egito Antigo como potência independente.'
+  }
+];
+
+const TOTAL=FASES.length;
+let nomeJogador='',turmaJogador='',faseAtual=0,vidas=5,pontos=0,acertos=0,historico=[],respondeu=false;
+
+function iniciar(){
+  nomeJogador=document.getElementById('nome').value.trim();
+  turmaJogador=document.getElementById('turma').value;
+  if(!nomeJogador){document.getElementById('nome').style.borderColor='#f87171';setTimeout(()=>document.getElementById('nome').style.borderColor='#334155',1500);return;}
+  if(!turmaJogador){document.getElementById('turma').style.borderColor='#f87171';setTimeout(()=>document.getElementById('turma').style.borderColor='#334155',1500);return;}
+  document.getElementById('tela-inicio').style.display='none';
+  document.getElementById('hud').style.display='block';
+  carregarFase();
+}
+
+function carregarFase(){
+  respondeu=false;
+  const fase=FASES[faseAtual];
+  document.getElementById('hud-fase-num').textContent=faseAtual+1;
+  document.getElementById('hud-pontos').textContent=pontos;
+  document.getElementById('progress-fill').style.width=(faseAtual/TOTAL*100)+'%';
+  atualizarVidas();
+  const opHTML=fase.opcoes.map((op,i)=>`<div class="opcao" onclick="responder(${i})" id="op-${i}"><div class="opcao-letra">${['A','B','C','D'][i]}</div><div class="opcao-texto">${op}</div></div>`).join('');
+  document.getElementById('tela-fase').style.display='block';
+  document.getElementById('tela-fase').innerHTML=`<div style="animation:fadeUp 0.4s ease"><div class="fase-badge"><div class="fase-num-badge">${faseAtual+1}</div>Fase ${faseAtual+1} de ${TOTAL}</div><div class="pergunta-card" style="--cor:${fase.cor}"><span class="pergunta-emoji">${fase.emoji}</span><div class="pergunta-texto">${fase.pergunta}</div></div><div class="opcoes">${opHTML}</div><div class="feedback" id="feedback"></div><button class="btn-prox" id="btn-prox" onclick="proximaFase()">Próxima fase →</button></div>`;
+}
+
+function responder(idx){
+  if(respondeu)return;
+  respondeu=true;
+  const fase=FASES[faseAtual];
+  const acertou=idx===fase.correta;
+  const fb=document.getElementById('feedback');
+  document.querySelectorAll('.opcao').forEach((el,i)=>{if(i===fase.correta)el.classList.add('correta');else if(i===idx&&!acertou)el.classList.add('errada');else el.classList.add('bloqueada');});
+  if(acertou){pontos+=100;acertos++;historico.push({fase:faseAtual+1,ok:true});fb.className='feedback ok';fb.textContent=fase.explicacao;}
+  else{vidas--;historico.push({fase:faseAtual+1,ok:false});atualizarVidas();fb.className='feedback err';fb.textContent='❌ Errou! A resposta correta era a opção '+['A','B','C','D'][fase.correta]+'. '+fase.explicacao.replace('✅','💡');if(document.getElementById('tela-fase')){document.getElementById('tela-fase').style.animation='shake 0.4s ease';setTimeout(()=>{if(document.getElementById('tela-fase'))document.getElementById('tela-fase').style.animation='';},400);}}
+  fb.style.display='block';
+  document.getElementById('hud-pontos').textContent=pontos;
+  const btn=document.getElementById('btn-prox');btn.style.display='block';
+  if(vidas===0){btn.textContent='💔 Ver resultado →';btn.onclick=()=>encerrar(false);}
+  else if(faseAtual===TOTAL-1){btn.textContent='🏆 Ver resultado!';btn.onclick=()=>encerrar(true);}
+}
+
+function proximaFase(){faseAtual++;if(faseAtual>=TOTAL||vidas===0)encerrar(faseAtual>=TOTAL&&vidas>0);else carregarFase();}
+function atualizarVidas(){document.querySelectorAll('.vida').forEach((v,i)=>v.classList.toggle('perdida',i>=vidas));}
+
+function encerrar(venceu){
+  document.getElementById('tela-fase').style.display='none';
+  document.getElementById('progress-fill').style.width='100%';
+  const pct=Math.round(acertos/TOTAL*100);
+  const primeiro=nomeJogador.split(' ')[0];
+  let emoji,titulo,sub;
+  if(acertos===TOTAL){emoji='🏆';titulo='Perfeito, '+primeiro+'!';sub='Você acertou todas as 10 fases!';}
+  else if(acertos>=7){emoji='🎉';titulo='Muito bem, '+primeiro+'!';sub='Ótimo desempenho em História!';}
+  else if(acertos>=5){emoji='👍';titulo='Bom trabalho, '+primeiro+'!';sub='Continue estudando para melhorar!';}
+  else if(vidas===0){emoji='💔';titulo='Fim de jogo, '+primeiro+'!';sub='Você perdeu todas as vidas. Tente de novo!';}
+  else{emoji='📚';titulo='Continue estudando, '+primeiro+'!';sub='Revise o conteúdo e tente novamente!';}
+  const recapHTML=historico.map(h=>`<div class="recap-item ${h.ok?'ok':'err'}"><span>${h.ok?'✅':'❌'}</span><span>Fase ${h.fase} ${h.ok?'· +100 pts':'· −1 vida'}</span></div>`).join('');
+  document.getElementById('tela-resultado').style.display='block';
+  document.getElementById('tela-resultado').innerHTML=`<span class="res-emoji">${emoji}</span><div class="res-titulo">${titulo}</div><div class="res-sub">${sub}</div><div class="res-card"><div class="stats-grid"><div class="stat-box"><span class="stat-val">${acertos}/${TOTAL}</span><span class="stat-lbl">Acertos</span></div><div class="stat-box"><span class="stat-val">${pontos}</span><span class="stat-lbl">Pontos</span></div><div class="stat-box"><span class="stat-val">${pct}%</span><span class="stat-lbl">Aproveitamento</span></div><div class="stat-box"><span class="stat-val">${Math.max(vidas,0)}❤️</span><span class="stat-lbl">Vidas restantes</span></div></div><div class="recap-titulo">Histórico de fases</div><div class="recap-grid">${recapHTML}</div></div><button class="btn-jogar-de-novo" onclick="location.reload()">↩ Jogar de novo</button><p class="enviando-msg" id="enviando-msg">Enviando resultado para a planilha...</p>`;
+  if(acertos>=5)confetes();
+  enviarResultado(pct);
+}
+
+function enviarResultado(pct){
+  const dados={nome:nomeJogador,turma:turmaJogador,horario:new Date().toLocaleString('pt-BR'),acertos:acertos+'/'+TOTAL,pontos,aproveitamento:pct+'%',vidas_restantes:Math.max(vidas,0),status:vidas===0?'Game Over':(acertos===TOTAL?'Completo — Perfeito!':'Completo')};
+  fetch(SCRIPT_URL,{method:'POST',body:JSON.stringify(dados)}).then(()=>{const el=document.getElementById('enviando-msg');if(el)el.textContent='✅ Resultado registrado na planilha!';}).catch(()=>{const el=document.getElementById('enviando-msg');if(el)el.textContent='';});
+}
+
+function confetes(){
+  const cores=['#f97316','#dc2626','#fbbf24','#8b5cf6','#4ade80','#ec4899','#facc15','#3b82f6'];
+  for(let i=0;i<80;i++)setTimeout(()=>{const c=document.createElement('div');c.className='confetti-piece';c.style.cssText=`left:${Math.random()*100}vw;background:${cores[~~(Math.random()*cores.length)]};width:${6+Math.random()*8}px;height:${6+Math.random()*8}px;animation-duration:${2+Math.random()*2.5}s;animation-delay:${Math.random()*0.8}s;border-radius:${Math.random()>.5?'50%':'2px'};`;document.body.appendChild(c);setTimeout(()=>c.remove(),5500);},i*30);
+}
+</script>
+</body>
+</html>
