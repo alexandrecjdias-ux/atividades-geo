@@ -1,0 +1,872 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jogo Pureza — Cultura Afro · 9º Ano</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap');
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Nunito',sans-serif;background:#0f172a;min-height:100vh;display:flex;align-items:flex-start;justify-content:center;padding:1.5rem 1rem 4rem}
+.container{max-width:560px;width:100%}
+
+/* INTRO */
+#tela-inicio{text-align:center;animation:fadeIn .5s ease}
+.logo{font-size:62px;display:block;margin-bottom:.4rem;filter:drop-shadow(0 0 18px rgba(124,58,237,.5))}
+.game-disc{font-size:11px;font-weight:800;color:#7c3aed;text-transform:uppercase;letter-spacing:2px;margin-bottom:.4rem}
+.game-title{font-size:25px;font-weight:900;color:white;line-height:1.2;margin-bottom:.3rem}
+.game-sub{font-size:13px;color:#94a3b8;margin-bottom:1.2rem}
+.info-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:1.2rem}
+.info-box{background:#1e293b;border-radius:14px;padding:12px 8px;display:flex;flex-direction:column;align-items:center;gap:4px}
+.info-icon{font-size:20px}.info-label{font-size:11px;color:#64748b;font-weight:700}.info-val{font-size:17px;font-weight:900;color:white}
+.mode-pills{display:flex;flex-wrap:wrap;justify-content:center;gap:6px;margin-bottom:1.2rem}
+.mode-pill{padding:5px 10px;border-radius:20px;font-size:11px;font-weight:800;background:#1e293b;color:#64748b;border:1px solid #334155}
+.form-wrap{background:#1e293b;border-radius:18px;padding:18px;margin-bottom:.8rem;text-align:left}
+.form-lbl{display:block;font-size:12px;font-weight:800;color:#64748b;text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px;margin-top:12px}
+.form-lbl:first-child{margin-top:0}
+.form-inp,.form-sel{width:100%;padding:11px 14px;background:#0f172a;border:2px solid #334155;border-radius:12px;color:white;font-family:'Nunito',sans-serif;font-size:14px;font-weight:700;outline:none;transition:border-color .2s;-webkit-appearance:none;appearance:none}
+.form-inp:focus,.form-sel:focus{border-color:#7c3aed}
+.form-sel option{background:#1e293b}
+.btn-start{width:100%;padding:15px;font-family:'Nunito',sans-serif;font-size:15px;font-weight:900;color:white;background:linear-gradient(135deg,#7c3aed,#a855f7);border:none;border-radius:16px;cursor:pointer;transition:all .2s;box-shadow:0 4px 18px rgba(124,58,237,.4)}
+.btn-start:hover{transform:translateY(-2px)}
+
+/* HUD */
+#hud{display:none;margin-bottom:1rem}
+.hud-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px}
+.hud-fase{font-size:13px;font-weight:800;color:#94a3b8}
+.hud-pontos{font-size:14px;font-weight:900;color:#f59e0b}
+.vidas{display:flex;gap:3px}
+.vida{font-size:18px;transition:all .3s}
+.vida.perdida{filter:grayscale(1);opacity:.3}
+.progress-wrap{height:6px;background:#1e293b;border-radius:3px;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(90deg,#7c3aed,#a855f7);border-radius:3px;transition:width .5s ease}
+
+/* FASE SHELL */
+#tela-fase{display:none}
+.fase-badge{display:inline-flex;align-items:center;gap:8px;background:#1e293b;border-radius:20px;padding:5px 12px;font-size:12px;font-weight:800;color:#64748b;margin-bottom:.8rem}
+.fase-num-b{background:#7c3aed;color:white;border-radius:50%;width:20px;height:20px;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:900}
+.feedback{display:none;padding:12px 16px;border-radius:14px;font-size:13px;font-weight:700;line-height:1.5;margin-bottom:.8rem}
+.feedback.ok{background:#052e16;color:#4ade80;border:1px solid #166534}
+.feedback.err{background:#2d0a0a;color:#f87171;border:1px solid #7f1d1d}
+.feedback.warn{background:#1c1407;color:#fbbf24;border:1px solid #92400e}
+.btn-prox{display:none;width:100%;padding:13px;font-family:'Nunito',sans-serif;font-size:14px;font-weight:800;color:white;background:linear-gradient(135deg,#7c3aed,#a855f7);border:none;border-radius:14px;cursor:pointer}
+
+/* MCQ SHARED */
+.perg-card{background:#1e293b;border-radius:18px;padding:18px;margin-bottom:.8rem;border-top:4px solid var(--cor,#7c3aed)}
+.perg-emoji{font-size:36px;display:block;text-align:center;margin-bottom:10px}
+.perg-txt{font-size:14px;font-weight:700;color:white;line-height:1.5;text-align:center}
+.opcoes{display:flex;flex-direction:column;gap:8px;margin-bottom:.8rem}
+.opcao{display:flex;align-items:center;gap:10px;background:#1e293b;border:2px solid #334155;border-radius:13px;padding:12px 14px;cursor:pointer;transition:all .2s}
+.opcao:hover{border-color:#7c3aed}
+.opcao.correta{border-color:#4ade80;background:#052e16;pointer-events:none}
+.opcao.errada{border-color:#f87171;background:#2d0a0a;pointer-events:none}
+.opcao.bloqueada{opacity:.4;pointer-events:none}
+.op-letra{width:26px;height:26px;border-radius:7px;background:#0f172a;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;color:#64748b;flex-shrink:0}
+.op-txt{font-size:13px;font-weight:700;color:#e2e8f0;line-height:1.4}
+
+/* TIMER */
+.timer-top{display:flex;align-items:center;gap:12px;margin-bottom:.8rem}
+.timer-ring{position:relative;width:70px;height:70px;flex-shrink:0}
+.timer-svg{width:70px;height:70px;transform:rotate(-90deg)}
+.timer-bg-c{fill:none;stroke:#1e293b;stroke-width:6}
+.timer-fg-c{fill:none;stroke:#4ade80;stroke-width:6;stroke-linecap:round;transition:stroke-dashoffset 1s linear,stroke .4s}
+.timer-num{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:900;color:white}
+.timer-perg{background:#1e293b;border-radius:14px;padding:14px;flex:1;border-top:4px solid var(--cor,#7c3aed)}
+.timer-perg-txt{font-size:13px;font-weight:700;color:white;line-height:1.4}
+
+/* MEMORY */
+.mem-info{font-size:12px;color:#64748b;text-align:center;font-weight:700;margin-bottom:.6rem;letter-spacing:.3px}
+.mem-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin-bottom:.8rem}
+.mem-card{height:70px;cursor:pointer;perspective:600px;-webkit-perspective:600px}
+.mem-card-inner{width:100%;height:100%;position:relative;transform-style:preserve-3d;-webkit-transform-style:preserve-3d;transition:transform .35s;-webkit-transition:transform .35s}
+.mem-card.flipped .mem-card-inner,.mem-card.matched .mem-card-inner{transform:rotateY(180deg);-webkit-transform:rotateY(180deg)}
+.mem-face{position:absolute;width:100%;height:100%;-webkit-backface-visibility:hidden;backface-visibility:hidden;border-radius:12px;display:flex;align-items:center;justify-content:center;padding:6px;text-align:center}
+.mem-front{background:#1e293b;border:2px solid #334155;font-size:20px}
+.mem-back{background:#2d1b69;border:2px solid #7c3aed;transform:rotateY(180deg);-webkit-transform:rotateY(180deg);font-size:9.5px;font-weight:700;color:#e2e8f0;line-height:1.3}
+.mem-card.matched .mem-back{background:#052e16;border-color:#4ade80;color:#4ade80}
+.mem-card.nomatch .mem-back{background:#2d0a0a;border-color:#f87171}
+
+/* ANAGRAM */
+.ana-dica{background:#1e293b;border-radius:13px;padding:12px 16px;margin-bottom:.8rem;font-size:12px;color:#64748b;font-weight:700;text-align:center;line-height:1.4}
+.ana-wrap{background:#0f172a;border:2px dashed #334155;border-radius:14px;min-height:58px;display:flex;justify-content:center;align-items:center;gap:6px;padding:10px;margin-bottom:.8rem;flex-wrap:wrap;transition:border-color .2s}
+.ana-wrap.active{border-color:#7c3aed}
+.ana-pool{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;margin-bottom:.8rem}
+.ana-tile{width:40px;height:40px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:900;cursor:pointer;transition:all .15s;flex-shrink:0;border:2px solid;user-select:none}
+.ana-tile.pool-t{background:#1e293b;border-color:#334155;color:white}
+.ana-tile.pool-t:hover{border-color:#7c3aed;background:#2d1b69}
+.ana-tile.placed-t{background:#7c3aed;border-color:#a855f7;color:white}
+.ana-tile.ghost-t{background:#0f172a;border-color:#1e293b;color:transparent;cursor:default}
+.btn-row{display:grid;grid-template-columns:1fr auto;gap:8px;margin-bottom:.4rem}
+.btn-check{padding:13px;font-family:'Nunito',sans-serif;font-size:14px;font-weight:800;color:white;background:linear-gradient(135deg,#7c3aed,#a855f7);border:none;border-radius:13px;cursor:pointer}
+.btn-reset-sm{padding:13px 14px;font-family:'Nunito',sans-serif;font-size:14px;color:#64748b;background:#1e293b;border:2px solid #334155;border-radius:13px;cursor:pointer;font-weight:700}
+
+/* DRAG/CLASSIFY */
+.drag-instr{font-size:12px;color:#64748b;font-weight:700;text-align:center;margin-bottom:.8rem}
+.drag-pool{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;min-height:36px;margin-bottom:.8rem}
+.drag-item{padding:7px 12px;border-radius:12px;font-size:12px;font-weight:700;cursor:pointer;transition:all .2s;border:2px solid #334155;background:#1e293b;color:#e2e8f0;text-align:center;line-height:1.3}
+.drag-item.sel{border-color:#ec4899;background:#3b0a2a;transform:scale(1.06)}
+.drag-item.gone{opacity:.2;pointer-events:none}
+.drag-cols{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:.8rem}
+.drag-col{background:#1e293b;border-radius:14px;border:2px solid #334155;min-height:90px;padding:10px;cursor:pointer;transition:border-color .2s}
+.drag-col.hl{border-color:#ec4899;background:#200e1a}
+.drag-col h4{font-size:10px;font-weight:800;color:#64748b;text-align:center;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px;pointer-events:none}
+.drag-col-items{display:flex;flex-direction:column;gap:5px;pointer-events:none}
+.drag-col-item{padding:6px 8px;border-radius:9px;font-size:11px;font-weight:700;text-align:center;background:#0f172a;color:#94a3b8}
+.drag-col-item.ok{background:#052e16;color:#4ade80}
+.drag-col-item.err{background:#2d0a0a;color:#f87171}
+.btn-full{width:100%;padding:13px;font-family:'Nunito',sans-serif;font-size:14px;font-weight:800;color:white;border:none;border-radius:13px;cursor:pointer}
+
+/* FILL BLANK */
+.fill-card{background:#1e293b;border-radius:16px;padding:22px 18px;margin-bottom:.8rem;text-align:center;border-top:4px solid #14b8a6}
+.fill-sentence{font-size:15px;font-weight:700;color:white;line-height:2.4}
+.fill-inp{padding:6px 8px;border:2px solid #14b8a6;border-radius:10px;background:#0f172a;color:white;font-family:'Nunito',sans-serif;font-size:20px;font-weight:900;width:76px;text-align:center;outline:none;display:inline-block;vertical-align:middle}
+.fill-dica{font-size:12px;color:#64748b;text-align:center;margin-bottom:.8rem;font-weight:700}
+
+/* VF */
+.vf-prog{display:flex;gap:6px;justify-content:center;margin-bottom:.8rem}
+.vf-dot{flex:1;max-width:40px;height:6px;border-radius:3px;background:#1e293b;transition:background .3s}
+.vf-dot.ok{background:#4ade80}
+.vf-dot.err{background:#f87171}
+.vf-dot.cur{background:#8b5cf6}
+.vf-card{background:#1e293b;border-radius:16px;padding:20px;min-height:90px;display:flex;align-items:center;justify-content:center;margin-bottom:1rem;border-top:4px solid #8b5cf6}
+.vf-txt{font-size:14px;font-weight:700;color:white;text-align:center;line-height:1.5}
+.vf-btns{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:.5rem}
+.vf-btn{padding:18px;font-family:'Nunito',sans-serif;font-size:18px;font-weight:900;border:2px solid;border-radius:14px;cursor:pointer;transition:transform .1s}
+.vf-btn:active{transform:scale(.93)}
+.vf-btn.v-btn{background:#052e16;color:#4ade80;border-color:#166534}
+.vf-btn.f-btn{background:#2d0a0a;color:#f87171;border-color:#7f1d1d}
+.vf-pts{font-size:12px;color:#f59e0b;text-align:center;font-weight:800}
+
+/* MAZE */
+.maze-pergunta{background:#1e293b;border-radius:13px;padding:14px;margin-bottom:.8rem;font-size:13px;font-weight:700;color:white;text-align:center;line-height:1.5;border-top:4px solid #e11d48}
+.maze-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin:0 auto .8rem}
+.m-tile{height:64px;border-radius:10px;background:#0f172a;border:2px solid #1e293b;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#475569;text-align:center;line-height:1.2;padding:4px;transition:background .2s,border-color .2s;word-break:break-word}
+.m-tile.player{background:#2d1b69;border-color:#7c3aed;font-size:22px;color:white}
+.m-tile.ans{background:#1e293b;border-color:#475569;color:#e2e8f0}
+.m-tile.correct-m{background:#052e16!important;border-color:#4ade80!important;font-size:22px!important;color:#4ade80!important}
+.m-tile.trap-m{background:#2d0a0a!important;border-color:#f87171!important;color:transparent!important}
+.maze-pad{display:grid;grid-template-columns:repeat(3,52px);gap:6px;justify-content:center;margin-bottom:.5rem}
+.maze-btn{width:52px;height:52px;border-radius:12px;background:#1e293b;border:2px solid #334155;font-size:20px;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s;user-select:none}
+.maze-btn:active{background:#2d1b69;border-color:#7c3aed;transform:scale(.9)}
+.maze-legend{font-size:11px;color:#475569;text-align:center;font-weight:700}
+
+/* RESULT */
+#tela-resultado{display:none}
+.res-emoji{font-size:68px;display:block;text-align:center;margin-bottom:.4rem}
+.res-titulo{font-size:22px;font-weight:900;color:white;text-align:center;margin-bottom:.3rem}
+.res-sub{font-size:13px;color:#94a3b8;text-align:center;margin-bottom:1.2rem}
+.res-card{background:#1e293b;border-radius:20px;padding:18px;margin-bottom:.8rem}
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:1.2rem}
+.stat-box{background:#0f172a;border-radius:13px;padding:11px 5px;text-align:center}
+.stat-val{font-size:24px;font-weight:900;color:white;display:block}
+.stat-lbl{font-size:11px;color:#64748b;display:block;margin-top:2px}
+.recap-tit{font-size:11px;font-weight:800;color:#475569;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px}
+.recap-grid{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.recap-item{display:flex;align-items:center;gap:7px;padding:8px 10px;border-radius:11px;font-size:12px;font-weight:700}
+.recap-item.ok{background:#052e16;color:#4ade80}
+.recap-item.err{background:#2d0a0a;color:#f87171}
+.btn-novo{width:100%;padding:13px;font-family:'Nunito',sans-serif;font-size:14px;font-weight:800;color:#94a3b8;background:#1e293b;border:2px solid #334155;border-radius:13px;cursor:pointer;margin-top:.4rem;transition:all .2s}
+.btn-novo:hover{border-color:#7c3aed;color:white}
+.env-msg{font-size:12px;color:#64748b;margin-top:8px;text-align:center}
+.confetti-piece{position:fixed;top:-10px;pointer-events:none;animation:confettiFall linear forwards}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-8px)}40%,80%{transform:translateX(8px)}}
+@keyframes confettiFall{0%{transform:translateY(0) rotate(0deg);opacity:1}100%{transform:translateY(100vh) rotate(720deg);opacity:0}}
+</style>
+</head>
+<body>
+<div class="container">
+
+<!-- TELA INÍCIO -->
+<div id="tela-inicio">
+  <span class="logo">✊</span>
+  <div class="game-disc">Cultura Afro-Brasileira · 9º Ano</div>
+  <div class="game-title">Pureza — Escravidão e Resistência</div>
+  <div class="game-sub">10 fases · Desafios variados · Resistência e memória</div>
+  <div class="info-grid">
+    <div class="info-box"><span class="info-icon">🎯</span><span class="info-label">Fases</span><span class="info-val">10</span></div>
+    <div class="info-box"><span class="info-icon">❤️</span><span class="info-label">Vidas</span><span class="info-val">5</span></div>
+    <div class="info-box"><span class="info-icon">⭐</span><span class="info-label">Pts</span><span class="info-val">~1000</span></div>
+  </div>
+  <div class="mode-pills">
+    <span class="mode-pill">⏱️ Cronometrada</span>
+    <span class="mode-pill">🃏 Memória</span>
+    <span class="mode-pill">🔤 Anagrama</span>
+    <span class="mode-pill">↔️ Classificar</span>
+    <span class="mode-pill">✍️ Lacuna</span>
+    <span class="mode-pill">⚡ Relâmpago V/F</span>
+    <span class="mode-pill">🗺️ Labirinto</span>
+  </div>
+  <div class="form-wrap">
+    <span class="form-lbl">👤 Seu nome completo</span>
+    <input class="form-inp" id="nome" type="text" placeholder="Digite seu nome...">
+    <span class="form-lbl">🏫 Sua turma</span>
+    <select class="form-sel" id="turma">
+      <option value="">— Selecione sua turma —</option>
+      <option value="9º A">9º A</option>
+      <option value="9º B">9º B</option>
+      <option value="9º C">9º C</option>
+      <option value="9º D">9º D</option>
+      <option value="9º E">9º E</option>
+    </select>
+  </div>
+  <button class="btn-start" onclick="iniciar()">🚀 Começar o jogo!</button>
+</div>
+
+<!-- HUD -->
+<div id="hud">
+  <div class="hud-row">
+    <div class="hud-fase">Fase <span id="hud-fase-num">1</span>/10</div>
+    <div class="hud-pontos">⭐ <span id="hud-pontos">0</span> pts</div>
+    <div class="vidas">
+      <span class="vida">❤️</span><span class="vida">❤️</span><span class="vida">❤️</span><span class="vida">❤️</span><span class="vida">❤️</span>
+    </div>
+  </div>
+  <div class="progress-wrap"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+</div>
+
+<!-- FASE / RESULTADO -->
+<div id="tela-fase"></div>
+<div id="tela-resultado"></div>
+
+</div><!-- /container -->
+
+<script>
+const SCRIPT_URL="https://script.google.com/macros/s/AKfycbydyp0t_TVhzz-ZJRoeO47qBccV7hDekbmUP1PFLoVpPtBiiGLwXFtSEKzzfYBklJ54/exec";
+
+const FASES=[
+  /* 1 — TIMER */
+  {type:'timer',tempo:25,cor:'#7c3aed',emoji:'🎬',titulo:'Fase Cronometrada',
+   pergunta:'Quem é a protagonista do filme <em>Pureza</em> (2019), que parte do Maranhão em busca de seu filho desaparecido no garimpo da Amazônia?',
+   opcoes:['Elenice, servidora do Ministério do Trabalho','Pureza Lopes Loyola, mulher nordestina do Maranhão','Maria das Dores, trabalhadora rural do Pará','Ana Loyola, ativista da Comissão Pastoral da Terra'],
+   correta:1,
+   explicacao:'✅ Pureza Lopes Loyola é a protagonista. Ela parte do Maranhão em busca de Abel, desaparecido no garimpo.'},
+
+  /* 2 — MEMORY */
+  {type:'memory',cor:'#a855f7',emoji:'🃏',titulo:'Fase Memória',
+   instrucao:'Encontre os 4 pares: conceito ↔ definição',
+   pares:[
+     {a:'"Gato"',b:'Aliciador com falsas promessas de trabalho'},
+     {a:'Lei Áurea',b:'Abolição formal da escravidão em 1888'},
+     {a:'Servidão por dívida',b:'Dívida impagável criada pelo fazendeiro'},
+     {a:'Lista suja',b:'Cadastro de empregadores com trabalho escravo'}
+   ]},
+
+  /* 3 — ANAGRAM */
+  {type:'anagram',cor:'#6366f1',emoji:'🔤',titulo:'Fase Anagrama',
+   palavra:'GATO',
+   dica:'Personagem que alicia trabalhadores pobres com falsas promessas de bom salário — palavra usada para nomear esse aliciador'},
+
+  /* 4 — DRAG/CLASSIFY */
+  {type:'drag',cor:'#ec4899',emoji:'↔️',titulo:'Fase Classificar',
+   instrucao:'Toque em um item e depois toque na coluna onde ele pertence',
+   colunas:['Escravidão Histórica','Escravidão Contemporânea'],
+   itens:[
+     {txt:'Tráfico transatlântico de africanos',col:0},
+     {txt:'Lei Áurea (1888)',col:0},
+     {txt:'Servidão por dívida nas fazendas',col:1},
+     {txt:'Grupo de Fiscalização Móvel',col:1},
+     {txt:'388 anos de escravização',col:0},
+     {txt:'Lista suja do MTE',col:1}
+   ]},
+
+  /* 5 — FILL BLANK */
+  {type:'fill',cor:'#14b8a6',emoji:'✍️',titulo:'Fase Lacuna',
+   antes:'Entre 2016 e 2018,',
+   depois:'% dos trabalhadores resgatados em situação análoga à escravidão eram negros.',
+   resposta:'82',
+   dica:'💡 Um número que revela que a escravidão contemporânea tem cor'},
+
+  /* 6 — TIMER (mais rápido) */
+  {type:'timer',tempo:20,cor:'#f97316',emoji:'⏱️',titulo:'Fase Cronometrada',
+   pergunta:'O Grupo Especial de Fiscalização Móvel — que percorre regiões remotas resgatando trabalhadores escravizados — foi criado em que ano?',
+   opcoes:['1888 — ano da Lei Áurea','1975 — fundação da CPT','1995 — 107 anos após a Lei Áurea','2003 — início do governo Lula'],
+   correta:2,
+   explicacao:'✅ Criado em 1995, 107 anos após a Lei Áurea. Desde então, mais de 60 mil trabalhadores foram resgatados.'},
+
+  /* 7 — VF RELÂMPAGO */
+  {type:'vf',cor:'#8b5cf6',emoji:'⚡',titulo:'Fase Relâmpago',
+   instrucao:'5 afirmações — Verdadeiro ou Falso?',
+   afirmacoes:[
+     {txt:'O Brasil foi o último das Américas a abolir a escravidão, em 1888.',ok:true},
+     {txt:'A Lei Áurea garantiu moradia, emprego e educação aos escravizados libertos.',ok:false},
+     {txt:'No filme, o Padre Flávio pertence à Comissão Pastoral da Terra.',ok:true},
+     {txt:'O filme Pureza foi filmado na cidade de Belém, no Pará.',ok:false},
+     {txt:'Mais de 60 mil trabalhadores foram resgatados desde a criação do Grupo Móvel.',ok:true}
+   ]},
+
+  /* 8 — MEMORY II */
+  {type:'memory',cor:'#3b82f6',emoji:'🃏',titulo:'Fase Memória II',
+   instrucao:'Encontre os 4 pares: personagem ↔ papel no filme',
+   pares:[
+     {a:'Padre Flávio',b:'Ativista da Comissão Pastoral da Terra'},
+     {a:'Elenice',b:'Servidora do Ministério do Trabalho'},
+     {a:'Pureza',b:'Documenta provas do trabalho escravo'},
+     {a:'Abel',b:'Filho desaparecido no garimpo da Amazônia'}
+   ]},
+
+  /* 9 — ANAGRAM II */
+  {type:'anagram',cor:'#10b981',emoji:'🔤',titulo:'Fase Anagrama',
+   palavra:'PUREZA',
+   dica:'Nome da protagonista do filme — símbolo de coragem e resistência negra'},
+
+  /* 10 — MAZE */
+  {type:'maze',cor:'#e11d48',emoji:'🗺️',titulo:'Fase Labirinto',
+   pergunta:'Qual instrumento foi criado em 1995, 107 anos após a Lei Áurea, para resgatar trabalhadores escravizados em regiões remotas do Brasil?',
+   respostas:[
+     {txt:'LISTA\nSUJA',correta:false},
+     {txt:'LEI\nÁUREA',correta:false},
+     {txt:'CPT',correta:false},
+     {txt:'GRUPO\nMÓVEL',correta:true}
+   ]}
+];
+
+const TOTAL=FASES.length;
+let nomeJ='',turmaJ='',faseAtual=0,vidas=5,pontos=0,acertos=0,historico=[],respondeu=false;
+
+/* ===== TIMER STATE ===== */
+let timerInterval=null,timerLeft=0,timerMax=0;
+
+/* ===== MEMORY STATE ===== */
+let memFlipped=[],memMatched=[],memLocked=false,memMisses=0,memCards=[];
+
+/* ===== ANAGRAM STATE ===== */
+let anaPool=[],anaPlaced=[];
+
+/* ===== DRAG STATE ===== */
+let dragSel=null,dragPlaced=[];
+
+/* ===== VF STATE ===== */
+let vfIdx=0,vfScore=0;
+
+/* ===== MAZE STATE ===== */
+let mazePos={r:0,c:0},mazeTiles={},mazeDone=false;
+const MR=4,MC=4;
+const MAZE_POS=[{r:0,c:3},{r:1,c:0},{r:2,c:3},{r:3,c:1}];
+
+/* ===========================
+   MAIN FLOW
+   =========================== */
+function iniciar(){
+  nomeJ=document.getElementById('nome').value.trim();
+  turmaJ=document.getElementById('turma').value;
+  if(!nomeJ){document.getElementById('nome').style.borderColor='#f87171';setTimeout(()=>document.getElementById('nome').style.borderColor='#334155',1500);return;}
+  if(!turmaJ){document.getElementById('turma').style.borderColor='#f87171';setTimeout(()=>document.getElementById('turma').style.borderColor='#334155',1500);return;}
+  document.getElementById('tela-inicio').style.display='none';
+  document.getElementById('hud').style.display='block';
+  carregarFase();
+}
+
+function carregarFase(){
+  clearTimer();
+  respondeu=false;
+  const fase=FASES[faseAtual];
+  document.getElementById('hud-fase-num').textContent=faseAtual+1;
+  document.getElementById('hud-pontos').textContent=pontos;
+  document.getElementById('progress-fill').style.width=(faseAtual/TOTAL*100)+'%';
+  atualizarVidas();
+  let inner='';
+  if(fase.type==='timer') inner=renderTimer(fase);
+  else if(fase.type==='memory') inner=renderMemory(fase);
+  else if(fase.type==='anagram') inner=renderAnagram(fase);
+  else if(fase.type==='drag') inner=renderDrag(fase);
+  else if(fase.type==='fill') inner=renderFill(fase);
+  else if(fase.type==='vf') inner=renderVF(fase);
+  else if(fase.type==='maze') inner=renderMaze(fase);
+  const badge=`<div class="fase-badge"><div class="fase-num-b">${faseAtual+1}</div>${fase.emoji} ${fase.titulo} &nbsp;·&nbsp; Fase ${faseAtual+1}/${TOTAL}</div>`;
+  const tf=document.getElementById('tela-fase');
+  tf.style.display='block';
+  tf.innerHTML=`<div style="animation:fadeUp .4s ease">${badge}${inner}<div class="feedback" id="feedback"></div><button class="btn-prox" id="btn-prox">Próxima fase →</button></div>`;
+  if(fase.type==='timer') startTimer(fase);
+  if(fase.type==='maze') initMaze(fase);
+}
+
+function avancarFase(){
+  clearTimer();
+  faseAtual++;
+  if(faseAtual>=TOTAL) encerrar();
+  else carregarFase();
+}
+
+function showFeedback(ok,msg,warn){
+  const fb=document.getElementById('feedback');
+  if(!fb)return;
+  fb.className='feedback '+(warn?'warn':ok?'ok':'err');
+  fb.textContent=msg;
+  fb.style.display='block';
+}
+
+function showProx(gameOver){
+  const btn=document.getElementById('btn-prox');
+  if(!btn)return;
+  btn.style.display='block';
+  if(gameOver||vidas===0){btn.textContent='💔 Ver resultado';btn.onclick=()=>encerrar();}
+  else if(faseAtual===TOTAL-1){btn.textContent='🏆 Ver resultado!';btn.onclick=()=>encerrar();}
+  else{btn.textContent='Próxima fase →';btn.onclick=()=>avancarFase();}
+}
+
+function marcarFase(ok,pts){
+  if(ok){pontos+=pts;acertos++;}else{vidas=Math.max(0,vidas-1);atualizarVidas();}
+  historico.push({fase:faseAtual+1,ok,tipo:FASES[faseAtual].emoji});
+  document.getElementById('hud-pontos').textContent=pontos;
+}
+
+/* ===========================
+   TIMER PHASE
+   =========================== */
+function renderTimer(fase){
+  const r=28,circ=Math.round(2*Math.PI*r);
+  const ops=fase.opcoes.map((op,i)=>`<div class="opcao" onclick="responderTimer(${i})" id="op-${i}"><div class="op-letra">${'ABCD'[i]}</div><div class="op-txt">${op}</div></div>`).join('');
+  return `<div class="timer-top" style="--cor:${fase.cor}">
+    <div class="timer-ring">
+      <svg class="timer-svg" viewBox="0 0 64 64">
+        <circle class="timer-bg-c" cx="32" cy="32" r="${r}"/>
+        <circle class="timer-fg-c" id="timer-fg" cx="32" cy="32" r="${r}" stroke-dasharray="${circ}" stroke-dashoffset="0"/>
+      </svg>
+      <div class="timer-num" id="timer-num">${fase.tempo}</div>
+    </div>
+    <div class="timer-perg" style="--cor:${fase.cor}"><div class="timer-perg-txt">${fase.pergunta}</div></div>
+  </div><div class="opcoes">${ops}</div>`;
+}
+
+function startTimer(fase){
+  timerMax=fase.tempo; timerLeft=fase.tempo;
+  const r=28,circ=Math.round(2*Math.PI*r);
+  timerInterval=setInterval(()=>{
+    timerLeft--;
+    const fg=document.getElementById('timer-fg'),num=document.getElementById('timer-num');
+    if(!fg||!num){clearTimer();return;}
+    const pct=(timerMax-timerLeft)/timerMax;
+    fg.style.strokeDashoffset=circ*pct;
+    fg.style.stroke=pct<.4?'#4ade80':pct<.7?'#f59e0b':'#ef4444';
+    num.textContent=timerLeft;
+    if(timerLeft<=0){clearTimer();if(!respondeu)timerOut(fase);}
+  },1000);
+}
+
+function timerOut(fase){
+  respondeu=true;
+  marcarFase(false,0);
+  document.querySelectorAll('.opcao').forEach((el,i)=>{
+    if(i===fase.correta)el.classList.add('correta');else el.classList.add('bloqueada');
+  });
+  showFeedback(false,`⏱️ Tempo esgotado! A resposta correta era a opção ${'ABCD'[fase.correta]}. ${fase.explicacao.replace('✅','💡')}`);
+  showProx(vidas===0);
+}
+
+function responderTimer(idx){
+  if(respondeu)return;
+  clearTimer();respondeu=true;
+  const fase=FASES[faseAtual];
+  const ok=idx===fase.correta;
+  document.querySelectorAll('.opcao').forEach((el,i)=>{
+    if(i===fase.correta)el.classList.add('correta');
+    else if(i===idx&&!ok)el.classList.add('errada');
+    else el.classList.add('bloqueada');
+  });
+  const bonus=ok?Math.round(50+50*(timerLeft/timerMax)):0;
+  marcarFase(ok,100+bonus);
+  showFeedback(ok,ok?`${fase.explicacao} (+${100+bonus} pts!)`:`❌ A opção ${'ABCD'[fase.correta]} era a correta. ${fase.explicacao.replace('✅','💡')}`);
+  showProx(vidas===0);
+}
+
+function clearTimer(){if(timerInterval){clearInterval(timerInterval);timerInterval=null;}}
+
+/* ===========================
+   MEMORY PHASE
+   =========================== */
+function renderMemory(fase){
+  memFlipped=[];memMatched=[];memLocked=false;memMisses=0;
+  const cards=[];
+  fase.pares.forEach((par,i)=>{
+    cards.push({pairId:i,txt:par.a});
+    cards.push({pairId:i,txt:par.b});
+  });
+  for(let i=cards.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[cards[i],cards[j]]=[cards[j],cards[i]];}
+  memCards=cards;
+  const grid=cards.map((c,i)=>`
+    <div class="mem-card" id="mc-${i}" onclick="flipCard(${i})">
+      <div class="mem-card-inner">
+        <div class="mem-face mem-front">✊</div>
+        <div class="mem-face mem-back">${c.txt}</div>
+      </div>
+    </div>`).join('');
+  return `<div class="mem-info" id="mem-info">${fase.instrucao} — Pares: <b>0/4</b> · Tentativas: <b>0</b></div><div class="mem-grid">${grid}</div>`;
+}
+
+function flipCard(idx){
+  if(memLocked||memMatched.includes(memCards[idx].pairId))return;
+  if(memFlipped.some(f=>f.idx===idx))return;
+  if(memFlipped.length>=2)return;
+  memFlipped.push({idx,pairId:memCards[idx].pairId});
+  document.getElementById(`mc-${idx}`).classList.add('flipped');
+  if(memFlipped.length===2){memLocked=true;setTimeout(checkPair,900);}
+}
+
+function checkPair(){
+  const [a,b]=memFlipped;
+  if(a.pairId===b.pairId){
+    memMatched.push(a.pairId);
+    [a.idx,b.idx].forEach(i=>document.getElementById(`mc-${i}`).classList.add('matched'));
+    const mi=document.getElementById('mem-info');
+    if(mi)mi.innerHTML=`Pares encontrados: <b>${memMatched.length}/4</b> · Tentativas: <b>${memMisses}</b>`;
+    if(memMatched.length===4){
+      const pts=Math.max(40,100-memMisses*10);
+      pontos+=pts;acertos++;
+      historico.push({fase:faseAtual+1,ok:true,tipo:FASES[faseAtual].emoji});
+      document.getElementById('hud-pontos').textContent=pontos;
+      showFeedback(true,`✅ Todos os pares encontrados! +${pts} pontos`);
+      showProx(false);
+    }
+  } else {
+    memMisses++;
+    [a.idx,b.idx].forEach(i=>{
+      const el=document.getElementById(`mc-${i}`);
+      if(el){el.classList.add('nomatch');setTimeout(()=>el.classList.remove('flipped','nomatch'),650);}
+    });
+    const mi=document.getElementById('mem-info');
+    if(mi)mi.innerHTML=`Pares encontrados: <b>${memMatched.length}/4</b> · Tentativas: <b>${memMisses}</b>`;
+  }
+  memFlipped=[];
+  setTimeout(()=>{memLocked=false;},700);
+}
+
+/* ===========================
+   ANAGRAM PHASE
+   =========================== */
+function renderAnagram(fase){
+  const lets=[...fase.palavra];
+  let sh=[...lets];
+  for(let i=sh.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[sh[i],sh[j]]=[sh[j],sh[i]];}
+  while(sh.join('')===fase.palavra){for(let i=sh.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[sh[i],sh[j]]=[sh[j],sh[i]];}}
+  anaPool=sh.map((l,i)=>({l,i,placed:false}));
+  anaPlaced=[];
+  const pool=anaPool.map((t,i)=>`<div class="ana-tile pool-t" id="ap-${i}" onclick="anaPick(${i})">${t.l}</div>`).join('');
+  const slots=lets.map((_,i)=>`<div class="ana-tile ghost-t" id="as-${i}"></div>`).join('');
+  return `<div class="ana-dica">💡 ${fase.dica}</div>
+    <div class="ana-wrap" id="ana-wrap">${slots}</div>
+    <div class="ana-pool" id="ana-pool">${pool}</div>
+    <div class="btn-row">
+      <button class="btn-check" id="btn-ana-check" onclick="anaVerify()">✅ Verificar</button>
+      <button class="btn-reset-sm" onclick="anaReset()">↩</button>
+    </div>`;
+}
+
+function anaPick(idx){
+  const t=anaPool[idx];
+  if(t.placed)return;
+  t.placed=true;
+  anaPlaced.push(idx);
+  anaUpdateDisplay();
+}
+
+function anaClickSlot(slotIdx){
+  if(slotIdx>=anaPlaced.length)return;
+  const pi=anaPlaced[slotIdx];
+  anaPool[pi].placed=false;
+  anaPlaced.splice(slotIdx,1);
+  anaUpdateDisplay();
+}
+
+function anaUpdateDisplay(){
+  const fase=FASES[faseAtual],n=fase.palavra.length;
+  for(let i=0;i<n;i++){
+    const sl=document.getElementById(`as-${i}`);
+    if(!sl)continue;
+    if(i<anaPlaced.length){
+      const l=anaPool[anaPlaced[i]].l;
+      sl.className='ana-tile placed-t';
+      sl.textContent=l;
+      sl.setAttribute('onclick',`anaClickSlot(${i})`);
+    } else {
+      sl.className='ana-tile ghost-t';
+      sl.textContent='';
+      sl.removeAttribute('onclick');
+    }
+  }
+  anaPool.forEach((t,i)=>{
+    const el=document.getElementById(`ap-${i}`);
+    if(!el)return;
+    el.style.opacity=t.placed?'.2':'1';
+    el.style.pointerEvents=t.placed?'none':'auto';
+  });
+  const aw=document.getElementById('ana-wrap');
+  if(aw)aw.className='ana-wrap'+(anaPlaced.length>0?' active':'');
+}
+
+function anaVerify(){
+  const fase=FASES[faseAtual];
+  const formed=anaPlaced.map(i=>anaPool[i].l).join('');
+  if(!formed)return;
+  const ok=formed===fase.palavra;
+  marcarFase(ok,100);
+  showFeedback(ok,ok?`✅ Correto! A palavra é "${fase.palavra}".`:`❌ "${formed}" está errado. A palavra correta é "${fase.palavra}".`);
+  document.querySelectorAll('.btn-check,.btn-reset-sm').forEach(b=>b.disabled=true);
+  showProx(vidas===0);
+}
+
+function anaReset(){anaPool.forEach(t=>t.placed=false);anaPlaced=[];anaUpdateDisplay();}
+
+/* ===========================
+   DRAG/CLASSIFY PHASE
+   =========================== */
+function renderDrag(fase){
+  dragSel=null;dragPlaced=fase.itens.map(()=>null);
+  const pool=fase.itens.map((it,i)=>`<div class="drag-item" id="di-${i}" onclick="dragSelect(${i})">${it.txt}</div>`).join('');
+  return `<p class="drag-instr">${fase.instrucao}</p>
+    <div class="drag-pool" id="drag-pool">${pool}</div>
+    <div class="drag-cols">
+      <div class="drag-col" id="dc-0" onclick="dragPlace(0)">
+        <h4>${fase.colunas[0]}</h4>
+        <div class="drag-col-items" id="dc-0-items"></div>
+      </div>
+      <div class="drag-col" id="dc-1" onclick="dragPlace(1)">
+        <h4>${fase.colunas[1]}</h4>
+        <div class="drag-col-items" id="dc-1-items"></div>
+      </div>
+    </div>
+    <button class="btn-full" id="drag-verify-btn" style="background:linear-gradient(135deg,#ec4899,#f97316)" onclick="dragVerify()">✅ Verificar</button>`;
+}
+
+function dragSelect(idx){
+  document.querySelectorAll('.drag-item').forEach(el=>el.classList.remove('sel'));
+  document.querySelectorAll('.drag-col').forEach(el=>el.classList.remove('hl'));
+  if(dragSel===idx){dragSel=null;return;}
+  dragSel=idx;
+  document.getElementById(`di-${idx}`).classList.add('sel');
+  document.querySelectorAll('.drag-col').forEach(el=>el.classList.add('hl'));
+}
+
+function dragPlace(col){
+  if(dragSel===null)return;
+  const idx=dragSel;dragSel=null;
+  dragPlaced[idx]=col;
+  const el=document.getElementById(`di-${idx}`);
+  if(el){el.classList.remove('sel');el.classList.add('gone');}
+  document.querySelectorAll('.drag-col').forEach(el=>el.classList.remove('hl'));
+  const ci=document.getElementById(`dc-${col}-items`);
+  if(ci){const d=document.createElement('div');d.className='drag-col-item';d.textContent=FASES[faseAtual].itens[idx].txt;ci.appendChild(d);}
+}
+
+function dragVerify(){
+  const fase=FASES[faseAtual];
+  let correct=0;
+  fase.itens.forEach((it,i)=>{if(dragPlaced[i]===it.col)correct++;});
+  // Re-color column items
+  for(let c=0;c<2;c++){
+    const ci=document.getElementById(`dc-${c}-items`);
+    if(!ci)continue;
+    ci.innerHTML='';
+    fase.itens.forEach((it,i)=>{
+      if(dragPlaced[i]===c){
+        const d=document.createElement('div');
+        d.className='drag-col-item '+(it.col===c?'ok':'err');
+        d.textContent=it.txt;
+        ci.appendChild(d);
+      }
+    });
+  }
+  const all=fase.itens.length,ok=correct===all;
+  const pts=Math.round((correct/all)*100);
+  if(ok){pontos+=100;acertos++;historico.push({fase:faseAtual+1,ok:true,tipo:fase.emoji});}
+  else{const wrong=all-correct;vidas=Math.max(0,vidas-Math.min(wrong,2));pontos+=pts;historico.push({fase:faseAtual+1,ok:false,tipo:fase.emoji});}
+  atualizarVidas();document.getElementById('hud-pontos').textContent=pontos;
+  showFeedback(ok,ok?'✅ Perfeito! Todos os itens classificados corretamente!':`❌ ${correct} de ${all} corretos. Veja as cores acima!`);
+  document.querySelectorAll('.drag-item,.drag-col,#drag-verify-btn').forEach(el=>el.style.pointerEvents='none');
+  showProx(vidas===0);
+}
+
+/* ===========================
+   FILL BLANK PHASE
+   =========================== */
+function renderFill(fase){
+  return `<div class="fill-card">
+    <div class="fill-sentence">${fase.antes} <input class="fill-inp" id="fill-inp" type="number" min="0" max="100" placeholder="?"> ${fase.depois}</div>
+  </div>
+  <p class="fill-dica">${fase.dica}</p>
+  <button class="btn-full" id="fill-btn" style="background:linear-gradient(135deg,#14b8a6,#0891b2)" onclick="fillVerify()">✅ Confirmar</button>`;
+}
+
+function fillVerify(){
+  const fase=FASES[faseAtual];
+  const inp=document.getElementById('fill-inp');
+  if(!inp||!inp.value.trim())return;
+  inp.disabled=true;
+  const ok=inp.value.trim()===fase.resposta;
+  inp.style.borderColor=ok?'#4ade80':'#f87171';
+  if(!ok)inp.value=fase.resposta;
+  marcarFase(ok,100);
+  showFeedback(ok,ok?`✅ Correto! ${fase.resposta}% dos trabalhadores resgatados eram negros — a escravidão contemporânea tem cor.`:`❌ A resposta correta é ${fase.resposta}%. Entre 2016-2018, ${fase.resposta}% dos resgatados eram negros.`);
+  document.getElementById('fill-btn').disabled=true;
+  showProx(vidas===0);
+}
+
+/* ===========================
+   VF RELÂMPAGO PHASE
+   =========================== */
+function renderVF(fase){
+  vfIdx=0;vfScore=0;
+  const dots=fase.afirmacoes.map((_,i)=>`<div class="vf-dot${i===0?' cur':''}" id="vfd-${i}"></div>`).join('');
+  return `<div class="vf-prog">${dots}</div>
+    <div class="vf-card"><div class="vf-txt" id="vf-txt">${fase.afirmacoes[0].txt}</div></div>
+    <div class="vf-btns" id="vf-btns">
+      <button class="vf-btn v-btn" onclick="vfResponder(true)">✅ VERDADEIRO</button>
+      <button class="vf-btn f-btn" onclick="vfResponder(false)">❌ FALSO</button>
+    </div>
+    <div class="vf-pts" id="vf-pts">⚡ Acertos: 0/5</div>`;
+}
+
+function vfResponder(resp){
+  const fase=FASES[faseAtual];
+  const af=fase.afirmacoes[vfIdx];
+  const ok=resp===af.ok;
+  const dot=document.getElementById(`vfd-${vfIdx}`);
+  if(dot){dot.classList.remove('cur');dot.classList.add(ok?'ok':'err');}
+  if(ok)vfScore++;else{vidas=Math.max(0,vidas-1);atualizarVidas();}
+  document.getElementById('vf-pts').textContent=`⚡ Acertos: ${vfScore}/${fase.afirmacoes.length}`;
+  document.querySelectorAll('.vf-btn').forEach(b=>{b.disabled=true;b.style.opacity='.5';});
+  setTimeout(()=>{
+    if(vidas===0){encerrar();return;}
+    vfIdx++;
+    if(vfIdx>=fase.afirmacoes.length){
+      const passou=vfScore>=3;
+      pontos+=vfScore*20;acertos+=(passou?1:0);
+      historico.push({fase:faseAtual+1,ok:passou,tipo:fase.emoji});
+      document.getElementById('hud-pontos').textContent=pontos;
+      showFeedback(passou,passou?`✅ ${vfScore}/5 corretos — bom trabalho no relâmpago!`:`❌ ${vfScore}/5 corretos. Revise o conteúdo!`);
+      document.getElementById('vf-btns').style.display='none';
+      showProx(false);
+    } else {
+      const nd=document.getElementById(`vfd-${vfIdx}`);
+      if(nd)nd.classList.add('cur');
+      const vt=document.getElementById('vf-txt');
+      if(vt)vt.textContent=fase.afirmacoes[vfIdx].txt;
+      document.querySelectorAll('.vf-btn').forEach(b=>{b.disabled=false;b.style.opacity='1';});
+    }
+  },800);
+}
+
+/* ===========================
+   MAZE PHASE
+   =========================== */
+function renderMaze(fase){
+  return `<div class="maze-pergunta">${fase.pergunta}</div>
+    <div class="maze-grid" id="maze-grid"></div>
+    <div class="maze-pad">
+      <div></div>
+      <button class="maze-btn" onclick="mazeMove(-1,0)">⬆️</button>
+      <div></div>
+      <button class="maze-btn" onclick="mazeMove(0,-1)">⬅️</button>
+      <button class="maze-btn" onclick="mazeMove(1,0)">⬇️</button>
+      <button class="maze-btn" onclick="mazeMove(0,1)">➡️</button>
+    </div>
+    <p class="maze-legend">✊ você &nbsp;·&nbsp; tiles escuros = respostas &nbsp;·&nbsp; cuidado com as armadilhas!</p>`;
+}
+
+function initMaze(fase){
+  mazePos={r:0,c:0};mazeTiles={};mazeDone=false;
+  MAZE_POS.forEach((pos,i)=>mazeTiles[`${pos.r},${pos.c}`]={...fase.respostas[i],hit:false});
+  drawMaze();
+}
+
+function drawMaze(){
+  let html='';
+  for(let r=0;r<MR;r++){
+    for(let c=0;c<MC;c++){
+      const key=`${r},${c}`,t=mazeTiles[key],isP=mazePos.r===r&&mazePos.c===c;
+      if(isP&&t&&t.hit&&t.correta) html+=`<div class="m-tile correct-m">✅</div>`;
+      else if(isP) html+=`<div class="m-tile player">✊</div>`;
+      else if(t&&!t.hit) html+=`<div class="m-tile ans">${t.txt}</div>`;
+      else if(t&&t.hit&&t.correta) html+=`<div class="m-tile correct-m">✅</div>`;
+      else if(t&&t.hit&&!t.correta) html+=`<div class="m-tile trap-m"></div>`;
+      else html+=`<div class="m-tile"></div>`;
+    }
+  }
+  const g=document.getElementById('maze-grid');
+  if(g)g.innerHTML=html;
+}
+
+function mazeMove(dr,dc){
+  if(mazeDone)return;
+  const nr=mazePos.r+dr,nc=mazePos.c+dc;
+  if(nr<0||nr>=MR||nc<0||nc>=MC)return;
+  mazePos={r:nr,c:nc};
+  const key=`${nr},${nc}`,t=mazeTiles[key];
+  drawMaze();
+  if(t&&!t.hit){
+    t.hit=true;
+    if(t.correta){
+      mazeDone=true;
+      drawMaze();
+      pontos+=100;acertos++;
+      historico.push({fase:faseAtual+1,ok:true,tipo:FASES[faseAtual].emoji});
+      document.getElementById('hud-pontos').textContent=pontos;
+      showFeedback(true,'✅ Achou! O Grupo Especial de Fiscalização Móvel foi criado em 1995 e já resgatou mais de 60 mil trabalhadores.');
+      document.querySelectorAll('.maze-btn').forEach(b=>b.disabled=true);
+      showProx(false);
+    } else {
+      vidas=Math.max(0,vidas-1);
+      atualizarVidas();
+      showFeedback(false,'⚠️ Armadilha! Perdeu uma vida. Tente outra rota!',true);
+      if(vidas===0){
+        mazeDone=true;
+        historico.push({fase:faseAtual+1,ok:false,tipo:FASES[faseAtual].emoji});
+        document.querySelectorAll('.maze-btn').forEach(b=>b.disabled=true);
+        showProx(true);
+      } else {
+        setTimeout(()=>{const fb=document.getElementById('feedback');if(fb)fb.style.display='none';},1400);
+      }
+    }
+  }
+}
+
+/* ===========================
+   HELPERS
+   =========================== */
+function atualizarVidas(){document.querySelectorAll('.vida').forEach((v,i)=>v.classList.toggle('perdida',i>=vidas));}
+
+function encerrar(){
+  clearTimer();
+  document.getElementById('tela-fase').style.display='none';
+  document.getElementById('progress-fill').style.width='100%';
+  const pct=Math.round(acertos/TOTAL*100);
+  const p=nomeJ.split(' ')[0];
+  let emoji,titulo,sub;
+  if(acertos===TOTAL){emoji='🏆';titulo='Incrível, '+p+'!';sub='Todas as fases completas!';}
+  else if(acertos>=7){emoji='🎉';titulo='Muito bem, '+p+'!';sub='Ótimo desempenho!';}
+  else if(acertos>=5){emoji='👍';titulo='Bom trabalho, '+p+'!';sub='Continue estudando!';}
+  else if(vidas===0){emoji='💔';titulo='Fim de jogo, '+p+'!';sub='Sem vidas. Tente de novo!';}
+  else{emoji='📚';titulo='Boa tentativa, '+p+'!';sub='Revise o conteúdo e jogue novamente!';}
+  const recap=historico.map(h=>`<div class="recap-item ${h.ok?'ok':'err'}"><span>${h.ok?'✅':'❌'}</span><span>${h.tipo} Fase ${h.fase}</span></div>`).join('');
+  const tr=document.getElementById('tela-resultado');
+  tr.style.display='block';
+  tr.innerHTML=`<span class="res-emoji">${emoji}</span><div class="res-titulo">${titulo}</div><div class="res-sub">${sub}</div>
+    <div class="res-card">
+      <div class="stats-grid">
+        <div class="stat-box"><span class="stat-val">${acertos}/${TOTAL}</span><span class="stat-lbl">Acertos</span></div>
+        <div class="stat-box"><span class="stat-val">${pontos}</span><span class="stat-lbl">Pontos</span></div>
+        <div class="stat-box"><span class="stat-val">${pct}%</span><span class="stat-lbl">Aproveit.</span></div>
+        <div class="stat-box"><span class="stat-val">${Math.max(vidas,0)}❤️</span><span class="stat-lbl">Vidas</span></div>
+      </div>
+      <div class="recap-tit">Histórico por fase</div>
+      <div class="recap-grid">${recap}</div>
+    </div>
+    <button class="btn-novo" onclick="location.reload()">↩ Jogar de novo</button>
+    <p class="env-msg" id="env-msg">Enviando resultado...</p>`;
+  if(acertos>=5)confetes();
+  enviar(pct);
+}
+
+function enviar(pct){
+  const d={nome:nomeJ,turma:turmaJ,horario:new Date().toLocaleString('pt-BR'),acertos:acertos+'/'+TOTAL,pontos,aproveitamento:pct+'%',vidas_restantes:Math.max(vidas,0),status:vidas===0?'Game Over':(acertos===TOTAL?'Completo — Perfeito!':'Completo')};
+  fetch(SCRIPT_URL,{method:'POST',body:JSON.stringify(d)}).then(()=>{const e=document.getElementById('env-msg');if(e)e.textContent='✅ Resultado registrado!';}).catch(()=>{const e=document.getElementById('env-msg');if(e)e.textContent='';});
+}
+
+function confetes(){
+  const cores=['#7c3aed','#a855f7','#ec4899','#f97316','#8b5cf6','#4ade80','#facc15','#3b82f6'];
+  for(let i=0;i<80;i++)setTimeout(()=>{const c=document.createElement('div');c.className='confetti-piece';c.style.cssText=`left:${Math.random()*100}vw;background:${cores[~~(Math.random()*cores.length)]};width:${6+Math.random()*8}px;height:${6+Math.random()*8}px;animation-duration:${2+Math.random()*2.5}s;animation-delay:${Math.random()*0.8}s;border-radius:${Math.random()>.5?'50%':'2px'};`;document.body.appendChild(c);setTimeout(()=>c.remove(),5500);},i*30);
+}
+</script>
+</body>
+</html>
