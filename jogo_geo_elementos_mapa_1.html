@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>Elementos do Mapa — 6º Ano</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap');
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:'Nunito',sans-serif;background:#0f172a;min-height:100vh;display:flex;align-items:flex-start;justify-content:center;padding:1.5rem 1rem 3rem}
+.container{max-width:520px;width:100%}
+
+/* INICIO */
+#tela-inicio{text-align:center;animation:fadeIn .5s ease}
+.logo{font-size:60px;display:block;margin-bottom:10px}
+.game-disc{font-size:12px;font-weight:800;color:#6366f1;text-transform:uppercase;letter-spacing:1.5px;margin-bottom:5px}
+.game-title{font-size:25px;font-weight:900;color:#fff;margin-bottom:5px}
+.game-sub{font-size:13px;color:#94a3b8;margin-bottom:20px}
+.info-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:20px}
+.info-box{background:#1e293b;border-radius:12px;padding:12px 6px;display:flex;flex-direction:column;align-items:center;gap:3px}
+.info-icon{font-size:20px}.info-label{font-size:10px;color:#64748b;font-weight:700;text-transform:uppercase}
+.info-val{font-size:16px;font-weight:900;color:#fff}
+.form-wrap{background:#1e293b;border-radius:16px;padding:18px;margin-bottom:14px;text-align:left}
+.form-lbl{font-size:12px;font-weight:800;color:#94a3b8;display:block;margin-bottom:5px;margin-top:12px}
+.form-lbl:first-child{margin-top:0}
+.form-inp,.form-select{width:100%;padding:11px 13px;background:#0f172a;border:2px solid #334155;border-radius:10px;color:#fff;font-family:'Nunito',sans-serif;font-size:14px;font-weight:600;outline:none;transition:border-color .2s}
+.form-inp:focus,.form-select:focus{border-color:#6366f1}
+.form-select option{background:#1e293b}
+.btn-start{width:100%;padding:15px;background:linear-gradient(135deg,#6366f1,#8b5cf6);border:none;border-radius:14px;color:#fff;font-family:'Nunito',sans-serif;font-size:16px;font-weight:900;cursor:pointer;box-shadow:0 4px 18px rgba(99,102,241,.35)}
+
+/* HUD */
+#hud{display:none;margin-bottom:14px}
+.hud-row{display:flex;align-items:center;gap:8px;margin-bottom:7px}
+.hud-fase{font-size:12px;font-weight:800;color:#94a3b8;flex:1}
+.hud-pontos{font-size:13px;font-weight:900;color:#f59e0b}
+.vidas{display:flex;gap:2px}
+.vida{font-size:17px;transition:all .3s}
+.vida.perdida{filter:grayscale(1) opacity(.25)}
+.progress-wrap{height:5px;background:#1e293b;border-radius:10px;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(90deg,#6366f1,#8b5cf6);border-radius:10px;transition:width .4s ease}
+
+/* FASE WRAPPER */
+#tela-fase{display:none}
+.fase-badge{display:inline-flex;align-items:center;gap:7px;background:#1e293b;border-radius:20px;padding:5px 13px;font-size:11px;font-weight:700;color:#64748b;text-transform:uppercase;letter-spacing:.5px;margin-bottom:12px}
+.fase-num-badge{background:#6366f1;color:#fff;width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900}
+.card{background:#1e293b;border-radius:18px;padding:20px;margin-bottom:12px}
+.card-cor{border-left:4px solid var(--cor)}
+.emoji-big{font-size:36px;display:block;margin-bottom:8px}
+.titulo-fase{font-size:11px;font-weight:800;color:var(--cor);text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px}
+.pergunta{font-size:15px;font-weight:700;color:#fff;line-height:1.5}
+.instrucao{font-size:13px;color:#94a3b8;margin-bottom:12px;line-height:1.5}
+
+/* MCQ / TIMER */
+.opcoes{display:grid;gap:9px;margin-bottom:12px}
+.opcao{background:#1e293b;border:2px solid #334155;border-radius:12px;padding:12px 14px;cursor:pointer;display:flex;align-items:center;gap:10px;font-size:13px;font-weight:700;color:#cbd5e1;transition:all .15s}
+.opcao:active{transform:scale(.97)}
+.opcao-letra{min-width:28px;height:28px;border-radius:7px;background:#0f172a;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:900;color:#94a3b8}
+.opcao.correta{border-color:#4ade80;background:#052e16;color:#4ade80}.opcao.correta .opcao-letra{background:#14532d;color:#4ade80}
+.opcao.errada{border-color:#f87171;background:#2d0a0a;color:#f87171;animation:shake .4s ease}.opcao.errada .opcao-letra{background:#450a0a;color:#f87171}
+.opcao.bloqueada{opacity:.35;cursor:default}
+
+/* TIMER BAR */
+.timer-wrap{height:8px;background:#0f172a;border-radius:10px;margin-bottom:12px;overflow:hidden}
+.timer-fill{height:100%;border-radius:10px;transition:width 1s linear,background .5s}
+
+/* FEEDBACK */
+.feedback{display:none;padding:12px 14px;border-radius:12px;font-size:12px;font-weight:700;line-height:1.5;margin-bottom:12px}
+.feedback.ok{background:#052e16;color:#4ade80;border:1px solid #166534}
+.feedback.err{background:#2d0a0a;color:#f87171;border:1px solid #7f1d1d}
+.btn-prox{display:none;width:100%;padding:13px;background:linear-gradient(135deg,#6366f1,#8b5cf6);border:none;border-radius:12px;color:#fff;font-family:'Nunito',sans-serif;font-size:14px;font-weight:800;cursor:pointer}
+
+/* MEMORY */
+.memory-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px}
+.mem-card{aspect-ratio:1;background:#334155;border-radius:10px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;text-align:center;padding:5px;color:#fff;line-height:1.3;transition:all .25s;perspective:600px;position:relative}
+.mem-card .front,.mem-card .back{position:absolute;inset:0;border-radius:10px;display:flex;align-items:center;justify-content:center;padding:5px;font-size:10px;font-weight:800;text-align:center;line-height:1.3;backface-visibility:hidden;transition:transform .35s}
+.mem-card .front{background:#334155;color:#94a3b8;transform:rotateY(0deg)}
+.mem-card .back{transform:rotateY(180deg)}
+.mem-card.flipped .front{transform:rotateY(180deg)}
+.mem-card.flipped .back{transform:rotateY(0deg)}
+.mem-card.matched{opacity:.5;cursor:default;pointer-events:none}
+.mem-card.wrong{animation:shake .4s}
+.mem-miss{font-size:12px;color:#f87171;text-align:center;margin-bottom:8px;min-height:18px}
+
+/* ANAGRAM */
+.palavra-display{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin-bottom:14px;min-height:48px}
+.letra-slot{width:38px;height:44px;border-radius:8px;background:#0f172a;border:2px solid #334155;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:900;color:#fff}
+.letra-slot.preenchida{border-color:#6366f1;background:#1e293b}
+.letras-grid{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin-bottom:12px}
+.letra-btn{width:42px;height:42px;border-radius:8px;background:#334155;border:none;font-family:'Nunito',sans-serif;font-size:16px;font-weight:900;color:#fff;cursor:pointer;transition:all .15s}
+.letra-btn:active{transform:scale(.9)}
+.letra-btn:disabled{opacity:.2;cursor:default}
+.btn-apagar{padding:10px 18px;background:#1e293b;border:2px solid #334155;border-radius:10px;color:#f87171;font-family:'Nunito',sans-serif;font-size:13px;font-weight:800;cursor:pointer;margin-bottom:12px}
+.dica-text{font-size:12px;color:#64748b;text-align:center;margin-bottom:10px;font-style:italic}
+
+/* DRAG (classificar) */
+.drag-itens{display:flex;flex-direction:column;gap:6px;margin-bottom:12px}
+.drag-item{background:#334155;border:2px solid #475569;border-radius:10px;padding:10px 13px;font-size:13px;font-weight:700;color:#fff;cursor:pointer;transition:all .2s;text-align:center}
+.drag-item.selecionado{border-color:#f59e0b;background:#451a03;color:#f59e0b}
+.drag-item.ok{border-color:#4ade80;background:#052e16;color:#4ade80;cursor:default}
+.drag-item.err{border-color:#f87171;background:#2d0a0a;color:#f87171;animation:shake .4s}
+.drag-colunas{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.drag-col{background:#0f172a;border:2px solid #334155;border-radius:12px;padding:10px;min-height:70px;cursor:pointer;transition:border-color .2s}
+.drag-col:hover{border-color:#6366f1}
+.drag-col-titulo{font-size:11px;font-weight:800;color:#64748b;text-align:center;margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px}
+.drag-col-itens{display:flex;flex-direction:column;gap:4px}
+.drag-col-item{font-size:11px;font-weight:700;color:#4ade80;text-align:center;padding:4px;border-radius:6px;background:#052e16}
+.drag-placar{font-size:12px;color:#94a3b8;text-align:center;margin-bottom:8px}
+
+/* FILL */
+.fill-frase{font-size:15px;font-weight:700;color:#fff;line-height:1.8;margin-bottom:14px}
+.fill-lacuna{display:inline-block;min-width:100px;border-bottom:2px solid #6366f1;color:#6366f1;font-weight:900}
+.fill-inp{width:100%;padding:12px;background:#0f172a;border:2px solid #334155;border-radius:10px;color:#fff;font-family:'Nunito',sans-serif;font-size:15px;font-weight:700;text-align:center;outline:none;margin-bottom:10px}
+.fill-inp:focus{border-color:#6366f1}
+.btn-confirmar{width:100%;padding:12px;background:#6366f1;border:none;border-radius:10px;color:#fff;font-family:'Nunito',sans-serif;font-size:14px;font-weight:800;cursor:pointer;margin-bottom:12px}
+
+/* VF */
+.vf-contador{font-size:12px;color:#94a3b8;text-align:center;margin-bottom:10px}
+.vf-afirmacao{background:#0f172a;border:2px solid #334155;border-radius:12px;padding:16px;font-size:14px;font-weight:700;color:#fff;text-align:center;line-height:1.5;margin-bottom:14px;min-height:80px;display:flex;align-items:center;justify-content:center}
+.vf-bts{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}
+.vf-btn{padding:16px;border:none;border-radius:12px;font-family:'Nunito',sans-serif;font-size:15px;font-weight:900;cursor:pointer;transition:all .15s}
+.vf-btn:active{transform:scale(.95)}
+.vf-v{background:#052e16;color:#4ade80;border:2px solid #166534}
+.vf-f{background:#2d0a0a;color:#f87171;border:2px solid #7f1d1d}
+.vf-mini-placar{display:flex;gap:6px;justify-content:center;margin-bottom:10px}
+.vf-dot{width:22px;height:22px;border-radius:50%;background:#1e293b;border:2px solid #334155;display:flex;align-items:center;justify-content:center;font-size:11px}
+.vf-dot.ok{background:#052e16;border-color:#4ade80;color:#4ade80}
+.vf-dot.err{background:#2d0a0a;border-color:#f87171;color:#f87171}
+
+/* MAZE */
+.maze-pergunta{font-size:14px;font-weight:700;color:#fff;text-align:center;margin-bottom:12px;line-height:1.5}
+.maze-grid{display:grid;gap:4px;margin:0 auto 14px;width:fit-content}
+.maze-cell{width:70px;height:70px;border-radius:10px;background:#1e293b;border:2px solid #334155;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;text-align:center;padding:4px;color:#64748b;transition:all .25s}
+.maze-cell.jogador{background:#6366f1;border-color:#818cf8;color:#fff;font-size:16px}
+.maze-cell.resposta{background:#0f172a;border-color:#475569;color:#94a3b8;cursor:default}
+.maze-cell.resposta.correta-reveal{background:#052e16;border-color:#4ade80;color:#4ade80}
+.maze-cell.resposta.errada-reveal{background:#2d0a0a;border-color:#f87171;color:#f87171}
+.maze-controles{display:grid;grid-template-columns:repeat(3,50px);grid-template-rows:repeat(2,50px);gap:6px;margin:0 auto 12px;justify-content:center}
+.maze-btn{width:50px;height:50px;background:#1e293b;border:2px solid #334155;border-radius:10px;color:#fff;font-size:18px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-family:'Nunito',sans-serif}
+.maze-btn:active{transform:scale(.9)}
+
+/* RESULTADO */
+#tela-resultado{display:none}
+.res-emoji{font-size:60px;display:block;text-align:center;margin-bottom:10px;animation:bounce .6s ease}
+.res-titulo{font-size:22px;font-weight:900;color:#fff;text-align:center;margin-bottom:5px}
+.res-sub{font-size:13px;color:#94a3b8;text-align:center;margin-bottom:18px}
+.res-card{background:#1e293b;border-radius:18px;padding:18px;margin-bottom:14px}
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px}
+.stat-box{text-align:center}
+.stat-val{font-size:22px;font-weight:900;color:#fff;display:block}
+.stat-lbl{font-size:10px;color:#64748b;display:block;margin-top:2px}
+.recap-titulo{font-size:11px;font-weight:800;color:#475569;text-transform:uppercase;letter-spacing:.5px;margin-bottom:8px}
+.recap-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.recap-item{display:flex;align-items:center;gap:7px;padding:8px 10px;border-radius:10px;font-size:12px;font-weight:700}
+.recap-item.ok{background:#052e16;color:#4ade80}
+.recap-item.err{background:#2d0a0a;color:#f87171}
+.btn-jogar-de-novo{width:100%;padding:13px;font-family:'Nunito',sans-serif;font-size:14px;font-weight:800;color:#94a3b8;background:#1e293b;border:2px solid #334155;border-radius:12px;cursor:pointer;margin-top:.5rem}
+.enviando-msg{font-size:12px;color:#64748b;margin-top:10px;text-align:center}
+.confetti-piece{position:fixed;top:-10px;pointer-events:none;animation:confettiFall linear forwards}
+
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+@keyframes bounce{0%,100%{transform:scale(1)}40%{transform:scale(1.2)}70%{transform:scale(.9)}}
+@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-7px)}40%,80%{transform:translateX(7px)}}
+@keyframes confettiFall{0%{transform:translateY(0) rotate(0deg);opacity:1}100%{transform:translateY(100vh) rotate(720deg);opacity:0}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+</style>
+</head>
+<body>
+<div class="container">
+  <div id="tela-inicio">
+    <span class="logo">🗺️</span>
+    <div class="game-disc">Geografia · 6º Ano</div>
+    <div class="game-title">Elementos do Mapa</div>
+    <div class="game-sub">10 fases com desafios diferentes!</div>
+    <div class="info-grid">
+      <div class="info-box"><span class="info-icon">🎯</span><span class="info-label">Fases</span><span class="info-val">10</span></div>
+      <div class="info-box"><span class="info-icon">❤️</span><span class="info-label">Vidas</span><span class="info-val">5</span></div>
+      <div class="info-box"><span class="info-icon">⭐</span><span class="info-label">Pontos</span><span class="info-val">até 1050</span></div>
+    </div>
+    <div class="form-wrap">
+      <span class="form-lbl">👤 Seu nome completo</span>
+      <input class="form-inp" id="nome" type="text" placeholder="Digite seu nome...">
+      <span class="form-lbl">🏫 Sua turma</span>
+      <select class="form-select" id="turma">
+        <option value="">— Selecione sua turma —</option>
+        <option>6º A</option><option>6º B</option><option>6º C</option><option>6º D</option>
+      </select>
+    </div>
+    <button class="btn-start" onclick="iniciar()">🚀 Começar o jogo!</button>
+  </div>
+
+  <div id="hud">
+    <div class="hud-row">
+      <div class="hud-fase">Fase <span id="hud-fase-num">1</span>/10</div>
+      <div class="hud-pontos">⭐ <span id="hud-pontos">0</span> pts</div>
+      <div class="vidas" id="vidas-display">
+        <span class="vida">❤️</span><span class="vida">❤️</span><span class="vida">❤️</span><span class="vida">❤️</span><span class="vida">❤️</span>
+      </div>
+    </div>
+    <div class="progress-wrap"><div class="progress-fill" id="progress-fill" style="width:0%"></div></div>
+  </div>
+
+  <div id="tela-fase"></div>
+  <div id="tela-resultado"></div>
+</div>
+
+<script>
+const SCRIPT_URL="https://script.google.com/macros/s/AKfycbydyp0t_TVhzz-ZJRoeO47qBccV7hDekbmUP1PFLoVpPtBiiGLwXFtSEKzzfYBklJ54/exec";
+
+// ══════════════════════════════════════════════════════
+// FASES — Mecânicas variadas
+// ══════════════════════════════════════════════════════
+const FASES = [
+  // 1 — TIMER
+  { type:'timer', tempo:25, cor:'#6366f1', emoji:'⏱️', titulo:'Fase Cronometrada',
+    pergunta:'Qual elemento do mapa indica o seu TEMA e dá um nome ao que está sendo representado?',
+    opcoes:['Legenda','Escala','Título','Fonte'], correta:2,
+    explicacao:'✅ O TÍTULO é o elemento que nomeia e apresenta o tema do mapa — ele responde à pergunta: "o que este mapa representa?"' },
+
+  // 2 — MEMORY
+  { type:'memory', cor:'#14b8a6', emoji:'🃏', titulo:'Jogo da Memória',
+    instrucao:'Encontre os 4 pares: elemento ↔ sua função',
+    pares:[
+      {a:'TÍTULO', b:'Nomeia e apresenta o tema do mapa', ca:'#6366f1', cb:'#4f46e5'},
+      {a:'ESCALA', b:'Indica a proporção entre o mapa e a realidade', ca:'#14b8a6', cb:'#0d9488'},
+      {a:'LEGENDA', b:'Explica o significado dos símbolos e cores', ca:'#ec4899', cb:'#db2777'},
+      {a:'FONTE', b:'Informa a origem dos dados do mapa', ca:'#f97316', cb:'#ea580c'},
+    ]},
+
+  // 3 — ANAGRAM
+  { type:'anagram', cor:'#f97316', emoji:'🔤', titulo:'Anagrama',
+    palavra:'ESCALA',
+    dica:'📏 Indica a proporção entre a distância no mapa e a distância real.' },
+
+  // 4 — DRAG
+  { type:'drag', cor:'#ec4899', emoji:'↔️', titulo:'Classifique!',
+    instrucao:'Toque em um item e depois toque na coluna onde ele pertence.',
+    colunas:['Ajuda a LER o mapa','Ajuda a LOCALIZAR no mapa'],
+    itens:[
+      {txt:'Legenda', col:0},
+      {txt:'Coordenadas', col:1},
+      {txt:'Título', col:0},
+      {txt:'Orientação', col:1},
+      {txt:'Fonte', col:0},
+      {txt:'Latitude e Longitude', col:1},
+    ]},
+
+  // 5 — FILL
+  { type:'fill', cor:'#8b5cf6', emoji:'✍️', titulo:'Complete a Frase',
+    antes:'A ___ de um mapa explica o significado dos símbolos, cores e padrões utilizados.',
+    depois:'',
+    resposta:'legenda',
+    dica:'💡 Ela funciona como um "dicionário" do mapa.' },
+
+  // 6 — TIMER (mais rápido)
+  { type:'timer', tempo:20, cor:'#3b82f6', emoji:'⏱️', titulo:'Contra o Relógio!',
+    pergunta:'A LATITUDE mede a distância angular de um ponto em relação a qual linha imaginária?',
+    opcoes:['Meridiano de Greenwich','Trópico de Capricórnio','Linha do Equador','Círculo Polar Ártico'], correta:2,
+    explicacao:'✅ A LATITUDE parte da Linha do Equador (0°), indo até 90° Norte ou Sul.' },
+
+  // 7 — VF
+  { type:'vf', cor:'#10b981', emoji:'⚡', titulo:'Relâmpago V ou F',
+    instrucao:'5 afirmações — responda Verdadeiro ou Falso!',
+    afirmacoes:[
+      {txt:'O título indica o tema e o nome do mapa.', ok:true},
+      {txt:'A legenda mostra a proporção entre o mapa e a realidade.', ok:false},
+      {txt:'A latitude mede a distância em relação ao Equador.', ok:true},
+      {txt:'A fonte informa quem produziu os dados do mapa.', ok:true},
+      {txt:'A rosa dos ventos faz parte da legenda do mapa.', ok:false},
+    ]},
+
+  // 8 — MEMORY (segundo par)
+  { type:'memory', cor:'#7c3aed', emoji:'🃏', titulo:'Jogo da Memória 2',
+    instrucao:'Mais 4 pares: elemento ↔ definição',
+    pares:[
+      {a:'ORIENTAÇÃO', b:'Indica os pontos cardeais (N, S, L, O)', ca:'#7c3aed', cb:'#6d28d9'},
+      {a:'COORDENADAS', b:'Sistema formado por latitude e longitude', ca:'#3b82f6', cb:'#2563eb'},
+      {a:'LATITUDE', b:'Distância angular até a Linha do Equador', ca:'#10b981', cb:'#059669'},
+      {a:'LONGITUDE', b:'Distância angular até o Meridiano de Greenwich', ca:'#f59e0b', cb:'#d97706'},
+    ]},
+
+  // 9 — ANAGRAM
+  { type:'anagram', cor:'#e11d48', emoji:'🔤', titulo:'Anagrama Final',
+    palavra:'LEGENDA',
+    dica:'📋 Explica todos os símbolos e cores usados no mapa.' },
+
+  // 10 — MAZE
+  { type:'maze', cor:'#6366f1', emoji:'🗺️', titulo:'Labirinto do Mapa',
+    pergunta:'Um aluno quer entender o que significa a área vermelha no mapa. Qual elemento ele deve consultar?',
+    respostas:[
+      {txt:'TÍTULO', correta:false},
+      {txt:'LEGENDA', correta:true},
+      {txt:'FONTE', correta:false},
+      {txt:'ESCALA', correta:false},
+    ]},
+];
+
+const TOTAL = FASES.length;
+let nomeJogador='', turmaJogador='', faseAtual=0, vidas=5, pontos=0, acertos=0, historico=[];
+
+// ══════════ CORE ══════════
+function iniciar(){
+  nomeJogador = document.getElementById('nome').value.trim();
+  turmaJogador = document.getElementById('turma').value;
+  if(!nomeJogador){document.getElementById('nome').style.borderColor='#f87171';setTimeout(()=>document.getElementById('nome').style.borderColor='#334155',1500);return;}
+  if(!turmaJogador){document.getElementById('turma').style.borderColor='#f87171';setTimeout(()=>document.getElementById('turma').style.borderColor='#334155',1500);return;}
+  document.getElementById('tela-inicio').style.display='none';
+  document.getElementById('hud').style.display='block';
+  carregarFase();
+}
+
+function carregarFase(){
+  const f = FASES[faseAtual];
+  document.getElementById('hud-fase-num').textContent = faseAtual+1;
+  document.getElementById('hud-pontos').textContent = pontos;
+  document.getElementById('progress-fill').style.width = (faseAtual/TOTAL*100)+'%';
+  atualizarVidas();
+  document.getElementById('tela-fase').style.display='block';
+  if(f.type==='timer') renderTimer(f);
+  else if(f.type==='memory') renderMemory(f);
+  else if(f.type==='anagram') renderAnagram(f);
+  else if(f.type==='drag') renderDrag(f);
+  else if(f.type==='fill') renderFill(f);
+  else if(f.type==='vf') renderVF(f);
+  else if(f.type==='maze') renderMaze(f);
+}
+
+function acertarFase(pts){
+  acertos++; pontos += pts;
+  historico.push({fase:faseAtual+1, ok:true, pts});
+  document.getElementById('hud-pontos').textContent = pontos;
+}
+function errarFase(){
+  vidas--;
+  historico.push({fase:faseAtual+1, ok:false, pts:0});
+  atualizarVidas();
+}
+function atualizarVidas(){
+  document.querySelectorAll('.vida').forEach((v,i)=>v.classList.toggle('perdida',i>=vidas));
+}
+function proxFase(){
+  faseAtual++;
+  if(faseAtual>=TOTAL || vidas<=0) encerrar();
+  else carregarFase();
+}
+function btnProxHTML(txt='Próxima fase →'){
+  return `<button class="btn-prox" id="btn-prox" style="display:block" onclick="proxFase()">${txt}</button>`;
+}
+function feedbackHTML(ok, msg){
+  return `<div class="feedback ${ok?'ok':'err'}" style="display:block">${msg}</div>`;
+}
+function badgeHTML(f){
+  return `<div class="fase-badge"><div class="fase-num-badge">${faseAtual+1}</div><span>${f.titulo}</span></div>`;
+}
+
+// ══════════ TIMER ══════════
+function renderTimer(f){
+  let respondeu=false, timerInt=null, tempoRestante=f.tempo;
+  const pct = ()=> (tempoRestante/f.tempo*100);
+  const opHTML = f.opcoes.map((op,i)=>
+    `<div class="opcao" onclick="respTimer(${i})" id="op-${i}">
+      <div class="opcao-letra">${['A','B','C','D'][i]}</div>
+      <div class="opcao-texto">${op}</div>
+    </div>`).join('');
+
+  document.getElementById('tela-fase').innerHTML = `
+    <div style="animation:fadeUp .4s ease">
+      ${badgeHTML(f)}
+      <div class="card card-cor" style="--cor:${f.cor}">
+        <span class="emoji-big">${f.emoji}</span>
+        <div class="timer-wrap"><div class="timer-fill" id="tfill" style="width:100%;background:${f.cor}"></div></div>
+        <div class="pergunta">${f.pergunta}</div>
+      </div>
+      <div class="opcoes">${opHTML}</div>
+      <div class="feedback" id="feedback"></div>
+      ${btnProxHTML()}
+    </div>`;
+
+  document.getElementById('btn-prox').style.display='none';
+  timerInt = setInterval(()=>{
+    tempoRestante--;
+    const fill = document.getElementById('tfill');
+    if(fill) fill.style.width = pct()+'%';
+    if(tempoRestante<=5 && fill) fill.style.background='#ef4444';
+    if(tempoRestante<=0){
+      clearInterval(timerInt);
+      if(!respondeu){ respondeu=true; errarFase(); fimTimer(f,-1); }
+    }
+  },1000);
+
+  window.respTimer = function(idx){
+    if(respondeu) return;
+    respondeu=true; clearInterval(timerInt);
+    const ok = idx===f.correta;
+    document.querySelectorAll('.opcao').forEach((el,i)=>{
+      if(i===f.correta) el.classList.add('correta');
+      else if(i===idx&&!ok) el.classList.add('errada');
+      else el.classList.add('bloqueada');
+    });
+    const bonus = ok? Math.round(tempoRestante/f.tempo*50):0;
+    if(ok) acertarFase(100+bonus); else errarFase();
+    fimTimer(f, ok? 100+bonus:0, ok);
+  };
+  function fimTimer(f, pts, ok){
+    const fb = document.getElementById('feedback');
+    const btn = document.getElementById('btn-prox');
+    if(fb){
+      if(pts<0){
+        fb.className='feedback err'; fb.style.display='block';
+        fb.textContent='⏰ Tempo esgotado! A resposta era a opção '+['A','B','C','D'][f.correta]+'. '+f.explicacao.replace('✅','');
+      } else if(ok){
+        fb.className='feedback ok'; fb.style.display='block';
+        fb.textContent = pts>100 ? `${f.explicacao} +${pts-100} pts de bônus de velocidade! 🚀` : f.explicacao;
+      } else {
+        fb.className='feedback err'; fb.style.display='block';
+        fb.textContent='❌ Errou! A resposta era a opção '+['A','B','C','D'][f.correta]+'. '+f.explicacao.replace('✅','');
+      }
+    }
+    if(btn){
+      btn.style.display='block';
+      if(vidas<=0) btn.textContent='💔 Ver resultado →';
+      else if(faseAtual===TOTAL-1) btn.textContent='🏆 Ver resultado!';
+    }
+  }
+}
+
+// ══════════ MEMORY ══════════
+function renderMemory(f){
+  let misses=0, matched=0, sel=null, bloqueado=false;
+  const cards=[];
+  f.pares.forEach((p,i)=>{
+    cards.push({id:`a${i}`, par:i, txt:p.a, cor:p.ca, tipo:'a'});
+    cards.push({id:`b${i}`, par:i, txt:p.b, cor:p.cb, tipo:'b'});
+  });
+  // embaralhar
+  for(let i=cards.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[cards[i],cards[j]]=[cards[j],cards[i]];}
+
+  const grid = cards.map((c,i)=>
+    `<div class="mem-card" id="mc${i}" onclick="flipCard(${i})">
+      <div class="front">❓</div>
+      <div class="back" style="background:${c.cor};font-size:10px;padding:6px">${c.txt}</div>
+    </div>`).join('');
+
+  document.getElementById('tela-fase').innerHTML=`
+    <div style="animation:fadeUp .4s ease">
+      ${badgeHTML(f)}
+      <div class="card" style="border-left:4px solid ${f.cor}">
+        <span class="emoji-big">${f.emoji}</span>
+        <div class="instrucao">${f.instrucao}</div>
+        <div class="mem-miss" id="mem-miss"></div>
+        <div class="memory-grid">${grid}</div>
+      </div>
+      <div class="feedback" id="feedback"></div>
+      ${btnProxHTML()}
+    </div>`;
+  document.getElementById('btn-prox').style.display='none';
+
+  window.flipCard=function(i){
+    if(bloqueado||cards[i].done||cards[i].flipped) return;
+    const el=document.getElementById(`mc${i}`);
+    cards[i].flipped=true; el.classList.add('flipped');
+    if(sel===null){ sel=i; return; }
+    const prev=sel; sel=null; bloqueado=true;
+    const ea=document.getElementById(`mc${prev}`), eb=el;
+    if(cards[prev].par===cards[i].par && cards[prev].tipo!==cards[i].tipo){
+      setTimeout(()=>{
+        ea.classList.add('matched'); eb.classList.add('matched');
+        cards[prev].done=cards[i].done=true;
+        bloqueado=false; matched++;
+        if(matched===f.pares.length){
+          const pts=Math.max(40,100-misses*10);
+          acertarFase(pts);
+          const fb=document.getElementById('feedback');
+          if(fb){fb.className='feedback ok';fb.style.display='block';fb.textContent=`✅ Todos os pares encontrados! +${pts} pontos${misses>0?' ('+misses+' erros)':', sem erros! 🎉'}`;}
+          const btn=document.getElementById('btn-prox');
+          if(btn){btn.style.display='block';if(faseAtual===TOTAL-1)btn.textContent='🏆 Ver resultado!';}
+        }
+      },400);
+    } else {
+      misses++;
+      ea.classList.add('wrong'); eb.classList.add('wrong');
+      const mm=document.getElementById('mem-miss');
+      if(mm) mm.textContent=`❌ Não é esse par! Erros: ${misses}`;
+      setTimeout(()=>{
+        ea.classList.remove('wrong','flipped'); eb.classList.remove('wrong','flipped');
+        cards[prev].flipped=cards[i].flipped=false; bloqueado=false;
+      },900);
+    }
+  };
+}
+
+// ══════════ ANAGRAM ══════════
+function renderAnagram(f){
+  const letras=[...f.palavra].sort(()=>Math.random()-.5);
+  let montado=[], usados=new Array(letras.length).fill(false);
+
+  function render(){
+    const slotHTML=Array.from({length:f.palavra.length},(_,i)=>
+      `<div class="letra-slot ${montado[i]?'preenchida':''}">${montado[i]||''}</div>`).join('');
+    const btnHTML=letras.map((l,i)=>
+      `<button class="letra-btn" ${usados[i]?'disabled':''} onclick="addLetra(${i})">${l}</button>`).join('');
+    document.getElementById('ana-slots').innerHTML=slotHTML;
+    document.getElementById('ana-btns').innerHTML=btnHTML;
+  }
+
+  document.getElementById('tela-fase').innerHTML=`
+    <div style="animation:fadeUp .4s ease">
+      ${badgeHTML(f)}
+      <div class="card" style="border-left:4px solid ${f.cor}">
+        <span class="emoji-big">${f.emoji}</span>
+        <div class="dica-text">${f.dica}</div>
+        <div class="palavra-display" id="ana-slots"></div>
+        <div class="letras-grid" id="ana-btns"></div>
+        <button class="btn-apagar" onclick="apagarUltima()">⌫ Apagar última</button>
+      </div>
+      <div class="feedback" id="feedback"></div>
+      ${btnProxHTML()}
+    </div>`;
+  document.getElementById('btn-prox').style.display='none';
+  render();
+
+  window.addLetra=function(i){
+    if(usados[i]||montado.length>=f.palavra.length) return;
+    montado.push(letras[i]); usados[i]=true; render();
+    if(montado.length===f.palavra.length) checarAnagram();
+  };
+  window.apagarUltima=function(){
+    if(!montado.length) return;
+    const ultima=montado.pop();
+    const idx=usados.findIndex((_,i)=>usados[i]&&letras[i]===ultima&&![...montado].includes(letras[i]));
+    // find first used matching letter not in current montado
+    for(let i=letras.length-1;i>=0;i--){
+      if(usados[i]&&letras[i]===ultima){
+        // check if still needed
+        const cnt=montado.filter(x=>x===ultima).length;
+        const have=letras.filter((x,j)=>usados[j]&&x===ultima).length;
+        if(have>cnt){usados[i]=false;break;}
+      }
+    }
+    render();
+  };
+  function checarAnagram(){
+    const palavra=montado.join('');
+    const ok=palavra===f.palavra;
+    const fb=document.getElementById('feedback'), btn=document.getElementById('btn-prox');
+    if(ok){
+      acertarFase(100);
+      if(fb){fb.className='feedback ok';fb.style.display='block';fb.textContent=`✅ Perfeito! A palavra é ${f.palavra}. ${f.dica}`;}
+    } else {
+      errarFase();
+      if(fb){fb.className='feedback err';fb.style.display='block';fb.textContent=`❌ Essa ordem não está certa. A palavra é "${f.palavra}". Tente lembrar da dica!`;}
+    }
+    if(btn){btn.style.display='block';if(vidas<=0)btn.textContent='💔 Ver resultado →';else if(faseAtual===TOTAL-1)btn.textContent='🏆 Ver resultado!';}
+    document.querySelectorAll('.letra-btn').forEach(b=>b.disabled=true);
+    document.querySelector('.btn-apagar').style.display='none';
+  }
+}
+
+// ══════════ DRAG ══════════
+function renderDrag(f){
+  let selecionado=null, colocados=new Array(f.itens.length).fill(null), erros=0;
+
+  function render(){
+    const itensFalta=f.itens.filter((_,i)=>colocados[i]===null);
+    const itensHTML=f.itens.map((it,i)=>colocados[i]!==null?'':
+      `<div class="drag-item${selecionado===i?' selecionado':''}" id="dit${i}" onclick="selItem(${i})">${it.txt}</div>`).join('');
+    const col0=f.itens.filter((_,i)=>colocados[i]===0).map(it=>`<div class="drag-col-item">${it.txt}</div>`).join('');
+    const col1=f.itens.filter((_,i)=>colocados[i]===1).map(it=>`<div class="drag-col-item">${it.txt}</div>`).join('');
+    document.getElementById('drag-itens').innerHTML=itensHTML||'<div style="text-align:center;color:#4ade80;font-size:13px;font-weight:700">✅ Todos classificados!</div>';
+    document.getElementById('col0-itens').innerHTML=col0;
+    document.getElementById('col1-itens').innerHTML=col1;
+    document.getElementById('drag-placar').textContent=`Erros: ${erros} | Classificados: ${colocados.filter(x=>x!==null).length}/${f.itens.length}`;
+  }
+
+  document.getElementById('tela-fase').innerHTML=`
+    <div style="animation:fadeUp .4s ease">
+      ${badgeHTML(f)}
+      <div class="card" style="border-left:4px solid ${f.cor}">
+        <span class="emoji-big">${f.emoji}</span>
+        <div class="instrucao">${f.instrucao}</div>
+        <div class="drag-itens" id="drag-itens"></div>
+        <div class="drag-colunas">
+          <div class="drag-col" onclick="colocarEm(0)">
+            <div class="drag-col-titulo">${f.colunas[0]}</div>
+            <div class="drag-col-itens" id="col0-itens"></div>
+          </div>
+          <div class="drag-col" onclick="colocarEm(1)">
+            <div class="drag-col-titulo">${f.colunas[1]}</div>
+            <div class="drag-col-itens" id="col1-itens"></div>
+          </div>
+        </div>
+        <div class="drag-placar" id="drag-placar"></div>
+      </div>
+      <div class="feedback" id="feedback"></div>
+      ${btnProxHTML()}
+    </div>`;
+  document.getElementById('btn-prox').style.display='none';
+  render();
+
+  window.selItem=function(i){ selecionado=(selecionado===i)?null:i; render(); };
+  window.colocarEm=function(col){
+    if(selecionado===null) return;
+    const ok=f.itens[selecionado].col===col;
+    if(ok){
+      colocados[selecionado]=col; selecionado=null;
+      if(colocados.every(x=>x!==null)){
+        const pts=Math.max(40,100-erros*10);
+        acertarFase(pts);
+        const fb=document.getElementById('feedback'), btn=document.getElementById('btn-prox');
+        if(fb){fb.className='feedback ok';fb.style.display='block';fb.textContent=`✅ Classificação completa! +${pts} pontos${erros>0?' ('+erros+' erros)':'!'}`;}
+        if(btn){btn.style.display='block';if(vidas<=0)btn.textContent='💔 Ver resultado →';else if(faseAtual===TOTAL-1)btn.textContent='🏆 Ver resultado!';}
+      }
+    } else {
+      erros++; if(erros>=2) errarFase();
+      const el=document.getElementById(`dit${selecionado}`);
+      if(el){el.classList.add('err');setTimeout(()=>{if(el)el.classList.remove('err');},500);}
+      selecionado=null;
+    }
+    render();
+  };
+}
+
+// ══════════ FILL ══════════
+function renderFill(f){
+  document.getElementById('tela-fase').innerHTML=`
+    <div style="animation:fadeUp .4s ease">
+      ${badgeHTML(f)}
+      <div class="card" style="border-left:4px solid ${f.cor}">
+        <span class="emoji-big">${f.emoji}</span>
+        <div class="fill-frase">A <span class="fill-lacuna">_____</span> de um mapa explica o significado dos símbolos, cores e padrões utilizados.</div>
+        <div class="dica-text">${f.dica}</div>
+        <input class="fill-inp" id="fill-inp" type="text" placeholder="Digite a resposta..." autocomplete="off" autocorrect="off" autocapitalize="off">
+        <button class="btn-confirmar" onclick="confirmarFill()">✅ Confirmar resposta</button>
+      </div>
+      <div class="feedback" id="feedback"></div>
+      ${btnProxHTML()}
+    </div>`;
+  document.getElementById('btn-prox').style.display='none';
+  document.getElementById('fill-inp').addEventListener('keyup',e=>{if(e.key==='Enter')confirmarFill();});
+
+  window.confirmarFill=function(){
+    const val=document.getElementById('fill-inp').value.trim().toLowerCase()
+      .normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+    const res=f.resposta.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+    const ok=val===res||val===res.replace(/[^a-z0-9]/g,'');
+    const fb=document.getElementById('feedback'), btn=document.getElementById('btn-prox');
+    document.querySelector('.btn-confirmar').style.display='none';
+    document.getElementById('fill-inp').disabled=true;
+    if(ok){
+      acertarFase(100);
+      if(fb){fb.className='feedback ok';fb.style.display='block';fb.textContent=`✅ Correto! A resposta é "${f.resposta}". ${f.dica}`;}
+    } else {
+      errarFase();
+      if(fb){fb.className='feedback err';fb.style.display='block';fb.textContent=`❌ A resposta correta é "${f.resposta}". ${f.dica}`;}
+    }
+    if(btn){btn.style.display='block';if(vidas<=0)btn.textContent='💔 Ver resultado →';else if(faseAtual===TOTAL-1)btn.textContent='🏆 Ver resultado!';}
+  };
+}
+
+// ══════════ VF ══════════
+function renderVF(f){
+  let atual=0, vfAcertos=0, vfHistorico=[];
+  function renderVFAtual(){
+    const af=f.afirmacoes[atual];
+    const dotsHTML=f.afirmacoes.map((_,i)=>{
+      const d=vfHistorico[i];
+      return `<div class="vf-dot${d===undefined?'':(d?' ok':' err')}">${d===undefined?i+1:(d?'✓':'✗')}</div>`;
+    }).join('');
+    document.getElementById('tela-fase').innerHTML=`
+      <div style="animation:fadeUp .4s ease">
+        ${badgeHTML(f)}
+        <div class="card" style="border-left:4px solid ${f.cor}">
+          <span class="emoji-big">${f.emoji}</span>
+          <div class="instrucao">${f.instrucao}</div>
+          <div class="vf-mini-placar">${dotsHTML}</div>
+          <div class="vf-contador">Afirmação ${atual+1} de ${f.afirmacoes.length}</div>
+          <div class="vf-afirmacao">${af.txt}</div>
+          <div class="vf-bts">
+            <button class="vf-btn vf-v" onclick="respVF(true)">✅ Verdadeiro</button>
+            <button class="vf-btn vf-f" onclick="respVF(false)">❌ Falso</button>
+          </div>
+        </div>
+        <div class="feedback" id="feedback"></div>
+        ${btnProxHTML('Próxima fase →')}
+      </div>`;
+    document.getElementById('btn-prox').style.display='none';
+  }
+
+  renderVFAtual();
+  window.respVF=function(resp){
+    const af=f.afirmacoes[atual];
+    const ok=resp===af.ok;
+    if(ok) vfAcertos++; else vidas--;
+    vfHistorico[atual]=ok;
+    atualizarVidas();
+    document.querySelectorAll('.vf-btn').forEach(b=>b.disabled=true);
+    const fb=document.getElementById('feedback');
+    if(fb){
+      fb.className=`feedback ${ok?'ok':'err'}`;fb.style.display='block';
+      fb.textContent=ok?`✅ Correto! Esta afirmação é ${af.ok?'verdadeira':'falsa'}.`:`❌ Errado! Esta afirmação é ${af.ok?'VERDADEIRA':'FALSA'}.`;
+    }
+    setTimeout(()=>{
+      atual++;
+      if(atual<f.afirmacoes.length && vidas>0){renderVFAtual();}
+      else{
+        const pts=vfAcertos*20;
+        acertarFase(pts);
+        const btn=document.getElementById('btn-prox');
+        if(btn){btn.style.display='block';if(vidas<=0)btn.textContent='💔 Ver resultado →';else if(faseAtual===TOTAL-1)btn.textContent='🏆 Ver resultado!';}
+        const fb2=document.getElementById('feedback');
+        if(fb2){fb2.className='feedback ok';fb2.style.display='block';fb2.textContent=`Fase concluída! Acertos: ${vfAcertos}/${f.afirmacoes.length} · +${pts} pontos`;}
+      }
+    },1200);
+  };
+}
+
+// ══════════ MAZE ══════════
+function renderMaze(f){
+  // Grid 3x4: jogador começa em (2,1), respostas em posições fixas
+  const ROWS=3, COLS=4;
+  // posições das respostas (row, col): (0,0),(0,3),(2,0),(2,3)
+  const resp_pos=[[0,0],[0,3],[2,0],[2,3]];
+  let jogador=[1,1]; // row, col — começa no meio
+  let terminado=false;
+
+  function celLabel(r,c){
+    const ri=resp_pos.findIndex(p=>p[0]===r&&p[1]===c);
+    if(ri>=0) return f.respostas[ri].txt;
+    return '';
+  }
+  function isResp(r,c){ return resp_pos.some(p=>p[0]===r&&p[1]===c); }
+
+  function renderMazeGrid(revealAll=false){
+    let cells='';
+    for(let r=0;r<ROWS;r++){
+      for(let c=0;c<COLS;c++){
+        const isJ=jogador[0]===r&&jogador[1]===c;
+        const ri=resp_pos.findIndex(p=>p[0]===r&&p[1]===c);
+        let cls='maze-cell';
+        let content='';
+        if(isJ){cls+=' jogador';content='🧭';}
+        else if(ri>=0){
+          cls+=' resposta';
+          if(revealAll) cls+=f.respostas[ri].correta?' correta-reveal':' errada-reveal';
+          content=f.respostas[ri].txt;
+        }
+        cells+=`<div class="${cls}">${content}</div>`;
+      }
+    }
+    document.getElementById('maze-grid').innerHTML=cells;
+  }
+
+  document.getElementById('tela-fase').innerHTML=`
+    <div style="animation:fadeUp .4s ease">
+      ${badgeHTML(f)}
+      <div class="card" style="border-left:4px solid ${f.cor}">
+        <span class="emoji-big">${f.emoji}</span>
+        <div class="maze-pergunta">${f.pergunta}</div>
+        <div class="maze-grid" id="maze-grid" style="grid-template-columns:repeat(${COLS},70px)"></div>
+        <div class="maze-controles">
+          <div></div>
+          <button class="maze-btn" onclick="moverMaze(-1,0)">⬆️</button>
+          <div></div>
+          <button class="maze-btn" onclick="moverMaze(0,-1)">⬅️</button>
+          <button class="maze-btn" onclick="moverMaze(1,0)">⬇️</button>
+          <button class="maze-btn" onclick="moverMaze(0,1)">➡️</button>
+        </div>
+        <div style="font-size:11px;color:#64748b;text-align:center">Navegue até a resposta correta!</div>
+      </div>
+      <div class="feedback" id="feedback"></div>
+      ${btnProxHTML()}
+    </div>`;
+  document.getElementById('btn-prox').style.display='none';
+  renderMazeGrid();
+
+  window.moverMaze=function(dr,dc){
+    if(terminado) return;
+    const nr=jogador[0]+dr, nc=jogador[1]+dc;
+    if(nr<0||nr>=ROWS||nc<0||nc>=COLS) return;
+    jogador=[nr,nc];
+    // chegou numa resposta?
+    const ri=resp_pos.findIndex(p=>p[0]===nr&&p[1]===nc);
+    if(ri>=0){
+      terminado=true;
+      const ok=f.respostas[ri].correta;
+      renderMazeGrid(true);
+      const fb=document.getElementById('feedback'), btn=document.getElementById('btn-prox');
+      if(ok){
+        acertarFase(100);
+        if(fb){fb.className='feedback ok';fb.style.display='block';fb.textContent='✅ Chegou na resposta certa! A LEGENDA explica os símbolos e cores do mapa.';}
+      } else {
+        errarFase();
+        if(fb){fb.className='feedback err';fb.style.display='block';fb.textContent='❌ Essa não é a resposta certa! O elemento correto é a LEGENDA — ela explica o significado de cada símbolo e cor.';}
+      }
+      if(btn){btn.style.display='block';if(vidas<=0)btn.textContent='💔 Ver resultado →';else if(faseAtual===TOTAL-1)btn.textContent='🏆 Ver resultado!';}
+    } else {
+      renderMazeGrid();
+    }
+  };
+}
+
+// ══════════ RESULTADO ══════════
+function encerrar(){
+  document.getElementById('tela-fase').style.display='none';
+  document.getElementById('progress-fill').style.width='100%';
+  const pct=Math.round(acertos/TOTAL*100);
+  const primeiro=nomeJogador.split(' ')[0];
+  let emoji,titulo,sub;
+  if(acertos===TOTAL){emoji='🏆';titulo=`Perfeito, ${primeiro}!`;sub='Você completou todas as fases!';}
+  else if(acertos>=7){emoji='🎉';titulo=`Muito bem, ${primeiro}!`;sub='Ótimo desempenho!';}
+  else if(acertos>=5){emoji='👍';titulo=`Bom trabalho, ${primeiro}!`;sub='Continue praticando!';}
+  else if(vidas<=0){emoji='💔';titulo=`Fim de jogo, ${primeiro}!`;sub='Perdeu todas as vidas. Tente de novo!';}
+  else{emoji='📚';titulo=`Revise o conteúdo, ${primeiro}!`;sub='Você consegue melhorar!';}
+
+  const recapHTML=historico.map(h=>
+    `<div class="recap-item ${h.ok?'ok':'err'}">
+      <span>${h.ok?'✅':'❌'}</span>
+      <span>Fase ${h.fase} ${h.ok?`· +${h.pts} pts`:'· −1 vida'}</span>
+    </div>`).join('');
+
+  document.getElementById('tela-resultado').style.display='block';
+  document.getElementById('tela-resultado').innerHTML=`
+    <span class="res-emoji">${emoji}</span>
+    <div class="res-titulo">${titulo}</div>
+    <div class="res-sub">${sub}</div>
+    <div class="res-card">
+      <div class="stats-grid">
+        <div class="stat-box"><span class="stat-val">${acertos}/${TOTAL}</span><span class="stat-lbl">Acertos</span></div>
+        <div class="stat-box"><span class="stat-val">${pontos}</span><span class="stat-lbl">Pontos</span></div>
+        <div class="stat-box"><span class="stat-val">${pct}%</span><span class="stat-lbl">Aproveitamento</span></div>
+        <div class="stat-box"><span class="stat-val">${Math.max(vidas,0)}❤️</span><span class="stat-lbl">Vidas</span></div>
+      </div>
+      <div class="recap-titulo">Histórico de fases</div>
+      <div class="recap-grid">${recapHTML}</div>
+    </div>
+    <button class="btn-jogar-de-novo" onclick="location.reload()">↩ Jogar de novo</button>
+    <p class="enviando-msg" id="enviando-msg">Enviando resultado para a planilha...</p>`;
+
+  if(acertos>=5) confetes();
+  enviarResultado(pct);
+}
+
+function enviarResultado(pct){
+  const dados={nome:nomeJogador,turma:turmaJogador,horario:new Date().toLocaleString('pt-BR'),
+    acertos:acertos+'/'+TOTAL,pontos,aproveitamento:pct+'%',
+    vidas_restantes:Math.max(vidas,0),status:vidas<=0?'Game Over':(acertos===TOTAL?'Completo — Perfeito!':'Completo')};
+  fetch(SCRIPT_URL,{method:'POST',body:JSON.stringify(dados)})
+    .then(()=>{const el=document.getElementById('enviando-msg');if(el)el.textContent='✅ Resultado registrado na planilha!';})
+    .catch(()=>{const el=document.getElementById('enviando-msg');if(el)el.textContent='';});
+}
+
+function confetes(){
+  const cores=['#6366f1','#ec4899','#14b8a6','#f97316','#8b5cf6','#4ade80','#facc15','#3b82f6'];
+  for(let i=0;i<80;i++) setTimeout(()=>{
+    const c=document.createElement('div'); c.className='confetti-piece';
+    c.style.cssText=`left:${Math.random()*100}vw;background:${cores[~~(Math.random()*cores.length)]};width:${6+Math.random()*8}px;height:${6+Math.random()*8}px;animation-duration:${2+Math.random()*2.5}s;animation-delay:${Math.random()*.8}s;border-radius:${Math.random()>.5?'50%':'2px'};`;
+    document.body.appendChild(c); setTimeout(()=>c.remove(),5500);
+  },i*30);
+}
+</script>
+</body>
+</html>
