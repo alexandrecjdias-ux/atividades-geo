@@ -1,0 +1,372 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Simulado — Agente de Trânsito (Vitória da Conquista/BA)</title>
+<style>
+  :root{
+    --card:#ffffff; --ink:#0f172a; --muted:#64748b;
+    --brand:#1d4ed8; --brand2:#1e3a8a; --ok:#16a34a; --okbg:#dcfce7;
+    --err:#dc2626; --errbg:#fee2e2; --line:#e2e8f0; --chip:#eef2ff;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  html,body{margin:0;padding:0}
+  body{font-family:-apple-system,BlinkMacSystemFont,system-ui,Segoe UI,Roboto,Arial,sans-serif;
+    background:#0f172a;color:var(--ink);-webkit-text-size-adjust:100%;}
+  header{position:-webkit-sticky;position:sticky;top:0;z-index:5;background:var(--brand2);color:#fff;
+    padding:calc(12px + env(safe-area-inset-top)) 16px 12px;box-shadow:0 2px 10px rgba(0,0,0,.25)}
+  header h1{margin:0;font-size:17px;line-height:1.25}
+  header p{margin:3px 0 0;font-size:12px;opacity:.85}
+  .wrap{max-width:820px;margin:0 auto;padding:14px}
+  .chips{display:flex;flex-wrap:wrap;gap:8px;margin:6px 0 12px}
+  .chip{-webkit-appearance:none;appearance:none;background:var(--chip);color:var(--brand2);padding:9px 12px;
+    border-radius:999px;font-size:13px;font-weight:600;cursor:pointer;border:1px solid transparent}
+  .chip.active{background:var(--brand);color:#fff}
+  .chip small{opacity:.7;font-weight:600}
+  .bar{height:8px;background:#334155;border-radius:999px;overflow:hidden;margin:2px 0 10px}
+  .bar > i{display:block;height:100%;width:0;background:linear-gradient(90deg,#22d3ee,#3b82f6);transition:width .3s}
+  .stat{display:flex;justify-content:space-between;color:#cbd5e1;font-size:12px;margin-bottom:8px}
+  .card{background:var(--card);border-radius:16px;padding:16px;box-shadow:0 6px 20px rgba(0,0,0,.18)}
+  .disc{display:inline-block;background:var(--chip);color:var(--brand2);font-size:11px;font-weight:700;
+    padding:4px 9px;border-radius:999px;margin-bottom:8px;text-transform:uppercase;letter-spacing:.3px}
+  .qnum{color:var(--muted);font-size:12px;font-weight:600;margin-bottom:4px}
+  .enun{font-size:16px;line-height:1.5;margin:0 0 14px;font-weight:500}
+  .opt{display:flex;gap:10px;align-items:flex-start;width:100%;text-align:left;border:1.5px solid var(--line);
+    background:#fff;border-radius:12px;padding:12px;margin:8px 0;font-size:15px;line-height:1.4;cursor:pointer;
+    -webkit-appearance:none;appearance:none;color:var(--ink)}
+  .opt .k{flex:0 0 26px;height:26px;border-radius:50%;background:#eef2ff;color:var(--brand2);
+    display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px}
+  .opt.ok{border-color:var(--ok);background:var(--okbg)}
+  .opt.ok .k{background:var(--ok);color:#fff}
+  .opt.err{border-color:var(--err);background:var(--errbg)}
+  .opt.err .k{background:var(--err);color:#fff}
+  .opt.dim{opacity:.6}
+  .exp{margin-top:10px;border-left:4px solid var(--brand);background:#f8fafc;padding:11px 12px;
+    border-radius:0 10px 10px 0;font-size:14px;line-height:1.5;display:none}
+  .exp.show{display:block}
+  .exp b{color:var(--brand2)}
+  .nav{display:flex;gap:10px;margin-top:14px}
+  .btn{flex:1;-webkit-appearance:none;appearance:none;border:none;border-radius:12px;padding:13px;
+    font-size:15px;font-weight:700;cursor:pointer}
+  .btn.primary{background:var(--brand);color:#fff}
+  .btn.ghost{background:#e2e8f0;color:#334155}
+  .btn:disabled{opacity:.45}
+  .foot{color:#94a3b8;font-size:11px;text-align:center;padding:14px 8px 40px;line-height:1.5}
+  .done{background:#fff;border-radius:16px;padding:22px;text-align:center}
+  .done h2{margin:.2em 0}
+  .score{font-size:40px;font-weight:800;color:var(--brand)}
+  .byd{text-align:left;margin:14px 0;font-size:14px}
+  .byd div{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px dashed var(--line)}
+  @media(max-width:480px){ header h1{font-size:15px} .enun{font-size:15px} }
+</style>
+</head>
+<body>
+<header>
+  <h1>Simulado — Agente de Trânsito</h1>
+  <p>Concurso da Prefeitura de Vitória da Conquista/BA • estudo por disciplina, com gabarito e explicação</p>
+</header>
+
+<div class="wrap">
+  <div id="chips" class="chips"></div>
+  <div class="stat"><span id="stMode">Todas as disciplinas</span><span id="stCount"></span></div>
+  <div class="bar"><i id="prog"></i></div>
+  <div id="app"></div>
+  <p class="foot">Banco de questões autorais para estudo, com base no CTB (atualizado pela Lei 14.071/2020) e no conteúdo típico do cargo. Não substitui o edital oficial. Bons estudos!</p>
+</div>
+
+<script>
+/* d = disciplina | q = enunciado | o = alternativas | a = índice da correta | e = explicação */
+var BANK = [
+/* ================= CTB / LEGISLAÇÃO ================= */
+{d:"CTB",q:"Segundo o CTB, compete ao órgão de trânsito do MUNICÍPIO, na sua circunscrição:",o:["Legislar sobre normas gerais de trânsito para o país","Cassar a validade nacional das habilitações","Fiscalizar, autuar e aplicar penalidades por infrações de circulação, estacionamento e parada nas vias urbanas","Julgar, em última instância, recursos de multas federais"],a:2,e:"Art. 24: o município cuida da engenharia de tráfego, da sinalização e fiscaliza/autua/aplica penalidades de circulação, estacionamento e parada nas vias urbanas. Legislar é da União (CONTRAN)."},
+{d:"CTB",q:"O órgão máximo NORMATIVO e consultivo do Sistema Nacional de Trânsito é:",o:["O DETRAN","O CONTRAN","A JARI","O CETRAN"],a:1,e:"O CONTRAN é o órgão máximo normativo e consultivo. O DETRAN é executivo estadual, a JARI julga recursos e o CETRAN é normativo/recursal no estado."},
+{d:"CTB",q:"A quem compete lavrar o auto de infração de trânsito?",o:["Somente ao juiz","À autoridade de trânsito ou ao seu agente","Apenas ao delegado","A qualquer cidadão"],a:1,e:"Art. 280: o auto de infração é lavrado pela autoridade de trânsito ou por seus agentes, ou por equipamento regulamentado."},
+{d:"CTB",q:"Sem sinalização, a velocidade máxima em uma VIA LOCAL urbana é:",o:["30 km/h","40 km/h","60 km/h","80 km/h"],a:0,e:"Art. 61: vias urbanas sem sinalização — 80 (trânsito rápido), 60 (arterial), 40 (coletora) e 30 km/h (local)."},
+{d:"CTB",q:"A infração GRAVÍSSIMA corresponde a:",o:["5 pontos e R$ 130,16","4 pontos e R$ 195,23","7 pontos e R$ 293,47","3 pontos e R$ 88,38"],a:2,e:"Leve 3 pts (R$ 88,38), média 4 (R$ 130,16), grave 5 (R$ 195,23) e gravíssima 7 pts (R$ 293,47), com possíveis multiplicadores."},
+{d:"CTB",q:"Após a Lei 14.071/2020, o limite GERAL de pontos para suspensão (sem infração gravíssima) é:",o:["20 pontos","30 pontos","40 pontos","50 pontos"],a:2,e:"Passou a 40 pontos em 12 meses. Cai para 30 (uma gravíssima) e 20 (duas ou mais). Motorista profissional: sempre 40."},
+{d:"CTB",q:"A validade da CNH de um condutor de 35 anos, em regra, é de:",o:["3 anos","5 anos","10 anos","Indeterminada"],a:2,e:"Art. 147: 10 anos até 49 anos; 5 anos de 50 a 70; 3 anos acima de 70."},
+{d:"CTB",q:"Dirigir sob influência de álcool (art. 165) é infração:",o:["Leve","Média","Gravíssima, com multa multiplicada e suspensão","Apenas crime"],a:2,e:"Gravíssima, multa x10, suspensão de 12 meses e retenção do veículo; pode também ser crime conforme o estado do condutor."},
+{d:"CTB",q:"Recusar-se a fazer o teste do bafômetro (art. 165-A):",o:["Não gera penalidade","Gera só advertência","Tem a mesma penalidade de dirigir embriagado (gravíssima, multa x10 e suspensão)","É permitido sempre"],a:2,e:"A recusa aos testes de alcoolemia é infração gravíssima, com multa multiplicada por dez e suspensão do direito de dirigir por 12 meses."},
+{d:"CTB",q:"São de porte obrigatório para conduzir:",o:["Apenas o RG","A CNH (ou Permissão) e o CRLV do veículo","Só o comprovante de residência","O certificado de direção defensiva"],a:1,e:"Habilitação (CNH/Permissão) e CRLV do veículo, hoje aceitos também na versão digital."},
+{d:"CTB",q:"Transitar sem usar o cinto de segurança é infração:",o:["Leve","Média","Grave","Gravíssima"],a:2,e:"Sem cinto = infração GRAVE (5 pts). Criança sem o dispositivo de retenção adequado = gravíssima."},
+{d:"CTB",q:"A categoria exigida para conduzir motocicletas é:",o:["A","B","C","D"],a:0,e:"A: motos e ciclomotores. B: automóveis até 3.500 kg. C: carga acima de 3.500 kg. D: ônibus/transporte de passageiros."},
+{d:"CTB",q:"Para conduzir ÔNIBUS (transporte de passageiros) exige-se a categoria:",o:["B","C","D","A"],a:2,e:"A categoria D habilita a conduzir veículos de transporte de passageiros com mais de 8 lugares (ônibus)."},
+{d:"CTB",q:"A penalidade de ADVERTÊNCIA por escrito pode substituir a multa quando:",o:["A infração é gravíssima","A infração é leve ou média e o condutor não é reincidente em 12 meses","O condutor pede com educação","Nunca é possível"],a:1,e:"Art. 267: em infração leve ou média, sem reincidência na mesma infração nos últimos 12 meses, a autoridade pode aplicar advertência por escrito."},
+{d:"CTB",q:"Dirigir manuseando o telefone celular é infração:",o:["Leve","Média","Gravíssima","Não é infração"],a:2,e:"Segurar ou manusear o celular dirigindo é infração gravíssima (7 pontos), por comprometer a atenção e a segurança."},
+{d:"CTB",q:"Dirigir veículo sem possuir CNH ou Permissão (art. 162, I) é:",o:["Leve","Média","Gravíssima, com retenção do veículo","Somente advertência"],a:2,e:"Conduzir sem habilitação é infração gravíssima, com multa multiplicada e retenção do veículo até a apresentação de condutor habilitado."},
+{d:"CTB",q:"Ultrapassar a velocidade da via em até 20% acima do limite é infração:",o:["Leve","Média","Grave","Gravíssima"],a:1,e:"Art. 218: até 20% acima = média; mais de 20% até 50% = grave; acima de 50% = gravíssima, com suspensão."},
+{d:"CTB",q:"Não dar preferência ao pedestre que atravessa na faixa é infração:",o:["Leve","Média","Gravíssima","Não é infração"],a:2,e:"Art. 214: deixar de dar preferência ao pedestre na faixa é gravíssima. O pedestre é o elo mais frágil do trânsito."},
+{d:"CTB",q:"A criança com menos de 10 anos deve ser transportada:",o:["No banco dianteiro sem restrição","No banco traseiro, com o dispositivo de retenção adequado","No colo de um adulto","Em qualquer lugar"],a:1,e:"Art. 64/168: menores de 10 anos vão no banco traseiro, com cadeirinha/assento/afivelados conforme a idade e o porte; o descumprimento é gravíssima."},
+{d:"CTB",q:"Sobre o capacete do motociclista, é infração gravíssima conduzir:",o:["Com o capacete afivelado","Sem capacete ou com ele desafivelado / sem viseira","Com viseira transparente","Em baixa velocidade"],a:1,e:"Conduzir moto sem capacete, ou com ele solto/desafivelado e sem a proteção adequada, é infração gravíssima."},
+{d:"CTB",q:"A diferença entre PARADA e ESTACIONAMENTO é que a parada:",o:["É a imobilização por tempo estritamente necessário para embarque/desembarque","É deixar o carro por horas","Só ocorre em rodovia","É sinônimo de estacionar"],a:0,e:"Parada é a imobilização breve para embarque/desembarque de passageiros. Estacionamento é a imobilização por tempo maior, além do necessário para embarque/desembarque."},
+{d:"CTB",q:"A medida administrativa de REMOÇÃO do veículo consiste em:",o:["Aplicar pontos na CNH","Levar o veículo ao depósito quando a irregularidade exige","Prender o condutor","Cancelar o licenciamento"],a:1,e:"Remoção é medida administrativa: o veículo é recolhido ao depósito. Difere de retenção (sanada no local) e de apreensão."},
+{d:"CTB",q:"Estacionar em vaga reservada a pessoa com deficiência ou idoso sem credencial é infração:",o:["Leve","Grave","Gravíssima","Não é infração"],a:1,e:"Estacionar indevidamente em vaga reservada (PCD/idoso) é infração GRAVE, além da remoção do veículo."},
+{d:"CTB",q:"O agente de trânsito, ao autuar, pratica ato:",o:["Judicial","Administrativo de fiscalização","Legislativo","Particular"],a:1,e:"A autuação é ato administrativo de fiscalização. O julgamento de recursos cabe à JARI/CETRAN; a esfera penal cabe ao Judiciário."},
+{d:"CTB",q:"Avançar o sinal vermelho do semáforo é infração:",o:["Leve","Média","Gravíssima","Não é infração"],a:2,e:"Avançar o vermelho é gravíssima (7 pts), por risco elevado a pedestres e a outros veículos."},
+{d:"CTB",q:"O documento que comprova o registro e o licenciamento anual do veículo é o:",o:["CNH","CRLV","RENAVAM apenas","IPVA"],a:1,e:"O CRLV (Certificado de Registro e Licenciamento de Veículo) comprova o licenciamento anual. O RENAVAM é o número de registro; o IPVA é um imposto."},
+{d:"CTB",q:"Transitar em faixa/via exclusiva de ônibus, sem autorização, é infração:",o:["Leve","Gravíssima","Advertência","Não é infração"],a:1,e:"Transitar indevidamente em faixa ou via de circulação exclusiva regulamentada é infração gravíssima."},
+{d:"CTB",q:"O prazo para o órgão expedir a notificação da autuação, sob pena de arquivamento, é de:",o:["10 dias","30 dias","90 dias","1 ano"],a:1,e:"A notificação da autuação deve ser expedida em até 30 dias da infração; passado o prazo sem expedição, o auto é arquivado."},
+{d:"CTB",q:"São penalidades previstas no CTB, EXCETO:",o:["Advertência por escrito","Multa","Suspensão do direito de dirigir","Prisão administrativa pelo agente no local"],a:3,e:"O agente não prende ninguém por infração administrativa. As penalidades incluem advertência, multa, suspensão, cassação e frequência a curso de reciclagem."},
+
+/* ================= SINALIZAÇÃO ================= */
+{d:"Sinalização",q:"Na ordem de PRIORIDADE da sinalização prevalece:",o:["A placa sobre o agente","A marca no piso sobre o semáforo","As ordens do agente de trânsito sobre qualquer outra sinalização","O semáforo sobre o agente"],a:2,e:"Art. 89: (1) agente, (2) semáforos, (3) placas de regulamentação, (4) marcas viárias. O agente prevalece sobre tudo."},
+{d:"Sinalização",q:"A placa PARE (R-1) tem formato e cor:",o:["Triângulo amarelo","Octógono vermelho","Círculo azul","Losango amarelo"],a:1,e:"A R-1 é a única placa octogonal, vermelha, de regulamentação e cumprimento obrigatório."},
+{d:"Sinalização",q:"As placas de ADVERTÊNCIA em geral têm:",o:["Fundo amarelo e forma de losango","Fundo vermelho e octogonal","Fundo azul retangular","Fundo verde circular"],a:0,e:"Advertência: fundo amarelo, losango, borda preta. Ex.: curva, lombada, escola."},
+{d:"Sinalização",q:"A placa 'Dê a preferência' (R-2) tem o formato de:",o:["Círculo","Quadrado","Triângulo com o vértice para baixo","Retângulo"],a:2,e:"R-2 é um triângulo com um vértice apontando para baixo, branco com borda vermelha."},
+{d:"Sinalização",q:"As placas de INDICAÇÃO costumam ter fundo:",o:["Amarelo","Vermelho","Azul ou verde","Preto"],a:2,e:"Indicação: fundo azul (serviços/atrativos) ou verde (identificação de vias e destinos)."},
+{d:"Sinalização",q:"Uma linha AMARELA CONTÍNUA no centro da pista indica:",o:["Ultrapassagem livre nos dois sentidos","Proibido ultrapassar e transpor a faixa","Permitido estacionar","Apenas enfeite"],a:1,e:"Linha amarela contínua separa fluxos opostos e proíbe ultrapassar/transpor. Tracejada, a ultrapassagem é permitida com segurança."},
+{d:"Sinalização",q:"O gesto do agente com o braço levantado na vertical significa:",o:["Siga em frente","Pare (equivale ao vermelho)","Acelere","Vire à esquerda"],a:1,e:"Braço na vertical = parada obrigatória para todos, equivalente ao sinal vermelho."},
+{d:"Sinalização",q:"O sinal LUMINOSO amarelo do semáforo indica:",o:["Siga normalmente","Atenção: pare, se puder fazê-lo com segurança","Acelere para passar","Estacione"],a:1,e:"O amarelo indica atenção: o condutor deve parar, salvo se já estiver tão próximo que a parada gere risco."},
+{d:"Sinalização",q:"A sinalização HORIZONTAL é aquela:",o:["Feita por placas verticais","Marcada no próprio pavimento (faixas, linhas, símbolos)","Feita só por semáforos","Feita por agentes"],a:1,e:"Sinalização horizontal são as marcas no piso (faixas de pedestre, linhas, setas). A vertical são as placas."},
+{d:"Sinalização",q:"As marcas de canalização e faixas na cor BRANCA, em regra, separam:",o:["Fluxos de sentidos opostos","Fluxos de mesmo sentido e delimitam faixas","Apenas vagas de idoso","Ciclovias somente"],a:1,e:"Branco: separa correntes de tráfego de MESMO sentido e delimita faixas/bordos. Amarelo: separa sentidos OPOSTOS."},
+{d:"Sinalização",q:"A placa de 'Velocidade máxima permitida' é de regulamentação e tem forma:",o:["De losango amarelo","Circular, com borda vermelha","Octogonal","Triangular"],a:1,e:"É placa de regulamentação (R-19), circular, fundo branco, borda vermelha, com o número do limite."},
+{d:"Sinalização",q:"Um silvo longo do apito do agente, em geral, significa:",o:["Siga","Pare","Acelere","Retorne"],a:1,e:"Convenção usual: um silvo longo = PARE; dois silvos breves = SIGA; vários silvos breves = atenção/redobrar cuidado."},
+{d:"Sinalização",q:"A faixa de travessia de pedestres (zebrado) serve para:",o:["Enfeitar a via","Indicar o local seguro e prioritário de travessia do pedestre","Marcar vaga de carga","Separar ciclovia"],a:1,e:"A faixa de pedestres indica o local de travessia, onde o pedestre tem prioridade e o condutor deve parar."},
+
+/* ================= DIREÇÃO DEFENSIVA ================= */
+{d:"Direção Defensiva",q:"Os cinco elementos básicos da direção defensiva são:",o:["Pressa, sorte, reflexo, força e coragem","Conhecimento, atenção, previsão, decisão e habilidade","Velocidade, potência, freio, câmbio e pneus","Multa, ponto, CNH, seguro e guincho"],a:1,e:"Direção defensiva = conhecimento, atenção, previsão, decisão e habilidade."},
+{d:"Direção Defensiva",q:"Um acidente EVITÁVEL é aquele em que:",o:["Nada poderia ser feito","O condutor deixou de fazer algo que o evitaria","Houve só falha mecânica oculta","Dependeu da sorte"],a:1,e:"Evitável: o condutor poderia ter agido (reduzir, sinalizar, manter distância) e não agiu. Inevitável foge ao seu controle."},
+{d:"Direção Defensiva",q:"As 'condições adversas' incluem:",o:["Luz, tempo, via, veículo, trânsito e condutor","Só chuva e neblina","Só o horário de pico","Só os pneus"],a:0,e:"Condições adversas: luz, tempo (clima), via, veículo, trânsito e o próprio condutor (sono, álcool, pressa)."},
+{d:"Direção Defensiva",q:"A 'regra dos dois segundos' serve para:",o:["Medir a troca de marcha","Manter distância segura do veículo à frente","Cronometrar o semáforo","Definir o tempo da seta"],a:1,e:"Ao passar o carro da frente por um ponto fixo, você deve levar ao menos 2 segundos para chegar lá (mais na chuva)."},
+{d:"Direção Defensiva",q:"Sob chuva forte, a conduta correta é:",o:["Acelerar para sair logo","Reduzir a velocidade, aumentar a distância e usar faróis baixos","Frear bruscamente","Desligar os faróis"],a:1,e:"Na chuva: menos velocidade, mais distância e faróis baixos acesos, evitando frenagens e manobras bruscas."},
+{d:"Direção Defensiva",q:"A aquaplanagem ocorre quando:",o:["O motor superaquece","Os pneus perdem contato com o solo por uma lâmina de água","A bateria descarrega","O vidro embaça"],a:1,e:"O pneu 'flutua' sobre a água e o carro perde dirigibilidade e freio. Previna com velocidade baixa e pneus bons."},
+{d:"Direção Defensiva",q:"O 'ponto cego' é:",o:["A área escura do painel","A região que não aparece nos retrovisores","O farol queimado","O centro do volante"],a:1,e:"Ponto cego é a área que escapa aos espelhos. Antes de mudar de faixa, gire rapidamente a cabeça para conferir."},
+{d:"Direção Defensiva",q:"Dirigir com sono/fadiga é perigoso porque:",o:["Melhora os reflexos","Reduz a atenção e aumenta o tempo de reação","Não afeta nada","Só afeta idosos"],a:1,e:"O cansaço diminui a atenção e alonga o tempo de reação, efeito parecido com o do álcool. Pare e descanse."},
+{d:"Direção Defensiva",q:"A distância de frenagem (parar o veículo) tende a:",o:["Diminuir com o aumento da velocidade","Aumentar com a velocidade e com o piso molhado","Não depender da velocidade","Ser sempre a mesma"],a:1,e:"Quanto maior a velocidade, maior a distância para parar; piso molhado ou pneus gastos aumentam ainda mais essa distância."},
+{d:"Direção Defensiva",q:"Uma ultrapassagem segura deve ser feita:",o:["Pela direita, a qualquer momento","Pela esquerda, com boa visibilidade e espaço, sinalizando","Em curvas e lombadas","Sobre a faixa contínua"],a:1,e:"Ultrapasse pela esquerda, apenas com visibilidade e distância seguras, sinalizando a manobra; nunca em curva, aclive sem visão ou faixa contínua."},
+{d:"Direção Defensiva",q:"Em relação a motociclistas e ciclistas, o condutor defensivo deve:",o:["Ignorá-los","Redobrar a atenção, pois são mais vulneráveis e ficam em pontos cegos","Buzinar para afastá-los","Ultrapassar bem colado"],a:1,e:"Motos e bicicletas são usuários vulneráveis; mantenha distância lateral segura e cuidado redobrado, sobretudo nos pontos cegos."},
+{d:"Direção Defensiva",q:"Nos primeiros minutos de chuva a pista fica mais perigosa porque:",o:["A água limpa o asfalto","A mistura de água com poeira e óleo deixa o piso mais escorregadio","O sol reflete","Os pneus aquecem"],a:1,e:"No início da chuva, a água mistura-se à poeira e ao óleo acumulados, reduzindo a aderência; redobre a atenção."},
+{d:"Direção Defensiva",q:"Ao entrar em um túnel, o condutor deve:",o:["Apagar os faróis","Acender os faróis (baixos)","Acelerar ao máximo","Buzinar constantemente"],a:1,e:"Em túneis é obrigatório manter os faróis acesos (luz baixa), pois há menor luminosidade."},
+{d:"Direção Defensiva",q:"A manutenção preventiva do veículo contribui para a segurança porque:",o:["Deixa o carro mais bonito","Garante freios, pneus, luzes e direção em boas condições","Aumenta o valor de revenda apenas","Reduz o preço do combustível"],a:1,e:"Pneus, freios, suspensão e iluminação em ordem previnem falhas e acidentes — parte essencial da direção defensiva."},
+{d:"Direção Defensiva",q:"Ao se aproximar de um cruzamento sem sinalização, o condutor deve:",o:["Acelerar para passar primeiro","Reduzir, observar e dar preferência a quem vem pela direita","Buzinar e seguir","Fechar os olhos"],a:1,e:"Sem sinalização, reduza e observe; em regra dá-se preferência ao veículo que vem pela direita, sempre priorizando a segurança."},
+{d:"Direção Defensiva",q:"O uso correto do cinto de segurança:",o:["É dispensável em baixas velocidades","Reduz lesões graves em colisões e é obrigatório para todos os ocupantes","Só serve para o motorista","Atrapalha a direção"],a:1,e:"O cinto reduz drasticamente lesões e mortes em colisões e é obrigatório para todos os ocupantes, à frente e atrás."},
+
+/* ================= PRIMEIROS SOCORROS ================= */
+{d:"Primeiros Socorros",q:"O telefone do SAMU é:",o:["190","192","193","199"],a:1,e:"SAMU = 192. Bombeiros = 193, Polícia Militar = 190."},
+{d:"Primeiros Socorros",q:"A PRIMEIRA providência do socorrista leigo num acidente é:",o:["Remover a vítima depressa","Garantir a segurança do local, sinalizando","Dar água à vítima","Tirar o capacete"],a:1,e:"Proteja a cena (sinalize, evite novas colisões), depois avalie a vítima e acione o SAMU (192)."},
+{d:"Primeiros Socorros",q:"O capacete do motociclista acidentado, em regra, deve ser:",o:["Retirado por qualquer pessoa","Mantido, evitando mexer no pescoço, salvo p/ liberar vias aéreas","Cortado","Enchido de água"],a:1,e:"Mexer na cabeça/pescoço pode agravar lesão na coluna; só remove pessoal treinado ou se for essencial para respirar."},
+{d:"Primeiros Socorros",q:"Para conter uma hemorragia externa, faz-se:",o:["Pó de café","Compressão direta com pano limpo","Dar analgésico","Cobrir com terra"],a:1,e:"Compressão direta e firme sobre o ferimento com pano limpo; mantenha a pressão e acione socorro."},
+{d:"Primeiros Socorros",q:"NÃO se deve dar água/alimento à vítima:",o:["Consciente e falando","Inconsciente ou com suspeita de lesão grave","Com sede leve","Que pediu"],a:1,e:"Vítima inconsciente ou traumatizada pode aspirar (engasgo) ou precisar de cirurgia. Nada por via oral nesses casos."},
+{d:"Primeiros Socorros",q:"A posição lateral de segurança (PLS) é indicada para:",o:["Fratura exposta","Vítima inconsciente que respira","Massagem cardíaca","Hemorragia no braço"],a:1,e:"Vítima inconsciente que respira: deitada de lado, evita que língua/vômito obstruam as vias aéreas."},
+{d:"Primeiros Socorros",q:"A avaliação inicial da vítima verifica:",o:["A cor da roupa","Consciência, respiração e circulação","O modelo do carro","Os documentos"],a:1,e:"Cheque responsividade, respiração e circulação para decidir condutas e informar ao SAMU."},
+{d:"Primeiros Socorros",q:"Diante de uma parada cardiorrespiratória, o leigo deve:",o:["Esperar o médico chegar","Chamar o SAMU e iniciar compressões torácicas (RCP)","Dar água","Sentar a vítima"],a:1,e:"Acione o 192 e inicie a RCP: compressões firmes e rápidas no centro do peito (100 a 120 por minuto) até a chegada do socorro."},
+{d:"Primeiros Socorros",q:"Em uma queimadura, a conduta correta é:",o:["Passar pasta de dente ou manteiga","Resfriar com água corrente em temperatura ambiente","Estourar as bolhas","Cobrir com algodão"],a:1,e:"Resfrie com água corrente; não use pasta, manteiga ou gelo, não estoure bolhas e não use algodão diretamente."},
+{d:"Primeiros Socorros",q:"Diante de uma fratura exposta, deve-se:",o:["Recolocar o osso no lugar","Imobilizar sem tentar recolocar o osso e proteger o ferimento","Puxar o membro","Dar remédio"],a:1,e:"Nunca recoloque o osso; imobilize na posição encontrada, cubra o ferimento e acione o socorro."},
+{d:"Primeiros Socorros",q:"Durante uma convulsão, o correto é:",o:["Segurar a pessoa com força","Proteger a cabeça e afastar objetos, sem colocar nada na boca","Colocar uma colher na boca","Jogar água"],a:1,e:"Proteja a cabeça, afaste objetos e aguarde a crise passar. Nunca coloque objetos na boca nem prenda a pessoa."},
+{d:"Primeiros Socorros",q:"A manobra de Heimlich é usada para:",o:["Parada cardíaca","Engasgo (obstrução das vias aéreas por corpo estranho)","Hemorragia","Fratura"],a:1,e:"A manobra de Heimlich (compressões abdominais) desobstrui as vias aéreas de quem está engasgado e não consegue respirar."},
+{d:"Primeiros Socorros",q:"Ao sinalizar o local de um acidente, o objetivo é:",o:["Chamar curiosos","Alertar outros condutores e evitar novos acidentes","Atrapalhar o trânsito","Cobrar pedágio"],a:1,e:"A sinalização (triângulo, pisca-alerta) alerta quem se aproxima e protege as vítimas e os socorristas."},
+
+/* ================= MEIO AMBIENTE E CIDADANIA ================= */
+{d:"Meio Ambiente",q:"Principais impactos ambientais dos veículos nas cidades:",o:["Poluição do ar e sonora","Aumento do ozônio benéfico","Melhora da água","Redução do efeito estufa"],a:0,e:"A queima de combustíveis polui o ar e o tráfego gera ruído (poluição sonora)."},
+{d:"Meio Ambiente",q:"Emitir fumaça/gases além dos limites é, no CTB:",o:["Permitido no campo","Infração de trânsito sujeita a penalidade","Fora da alçada do agente","Só manutenção particular"],a:1,e:"Art. 231: transitar com veículo que emita fumaça, gases ou ruído acima dos limites é infração."},
+{d:"Meio Ambiente",q:"Atitude de mobilidade sustentável é:",o:["Buzinar sem parar","Dar preferência ao pedestre e incentivar transporte coletivo e bicicleta","Ocupar vaga de idoso","Jogar lixo pela janela"],a:1,e:"Priorizar pedestres, transporte público e modos ativos reduz poluição e acidentes — cidadania no trânsito."},
+{d:"Meio Ambiente",q:"Segundo o CTB, o trânsito seguro é direito de todos e dever:",o:["Só dos motoristas","Só dos agentes","Dos órgãos e entidades do Sistema Nacional de Trânsito","Só dos pedestres"],a:2,e:"Art. 1º, §2º: o trânsito seguro é direito de todos e dever dos órgãos do SNT, que respondem por ação, omissão ou erro."},
+{d:"Meio Ambiente",q:"A faixa de pedestres e o tempo de semáforo existem para:",o:["Atrapalhar o motorista","Proteger a vida e a mobilidade do pedestre","Enfeitar","Arrecadar multas"],a:1,e:"A prioridade ao pedestre é princípio de segurança viária: reduz atropelamentos."},
+{d:"Meio Ambiente",q:"O uso da buzina, pelo CTB, deve ser:",o:["Livre e constante","Breve e apenas para avisos necessários de segurança","Proibido sempre","Para cumprimentar amigos"],a:1,e:"A buzina é sinal de advertência, de uso breve e só quando necessário à segurança; o uso abusivo é infração e gera poluição sonora."},
+{d:"Meio Ambiente",q:"O descarte correto de óleo lubrificante e pneus usados deve ser feito:",o:["Na rua ou em rios","Em pontos de coleta/reciclagem apropriados","No lixo comum","Enterrando no quintal"],a:1,e:"Óleo e pneus são resíduos poluentes; devem ir a pontos de coleta e logística reversa, nunca ao meio ambiente ou lixo comum."},
+{d:"Meio Ambiente",q:"O programa que controla a emissão de poluentes de veículos novos no Brasil é o:",o:["PROCONVE","BOLSA FAMÍLIA","PRONATEC","SUS"],a:0,e:"O PROCONVE (Programa de Controle da Poluição do Ar por Veículos Automotores), do CONAMA, estabelece limites de emissão para veículos."},
+{d:"Meio Ambiente",q:"Ceder passagem a idosos, gestantes e pessoas com deficiência no trânsito é:",o:["Opcional e raro","Dever de cidadania e previsto em lei (prioridade)","Proibido","Só em datas comemorativas"],a:1,e:"A prioridade a idosos, gestantes e PCD é dever de cidadania e tem amparo legal, refletindo respeito e segurança no trânsito."},
+{d:"Meio Ambiente",q:"A campanha nacional 'Maio Amarelo' tem como foco:",o:["Combate à dengue","Conscientização e segurança no trânsito","Doação de sangue","Alfabetização"],a:1,e:"O Maio Amarelo é um movimento mundial de conscientização para reduzir mortes e lesões no trânsito."},
+
+/* ================= PORTUGUÊS ================= */
+{d:"Português",q:"Assinale a frase totalmente CORRETA quanto à acentuação:",o:["O agente fiscalizou o tránsito.","A vítima recebeu os primeiros socorros.","O veiculo estava irregular.","A regra é facil."],a:1,e:"Em B tudo está certo. Faltam/erram acentos em 'trânsito', 'veículo' e 'fácil'."},
+{d:"Português",q:"'O guarda ADVERTIU o condutor' — advertir significa:",o:["Elogiar","Chamar a atenção / avisar","Multar em dinheiro","Perdoar"],a:1,e:"Advertir = avisar, alertar. É também uma penalidade educativa (advertência por escrito)."},
+{d:"Português",q:"Qual apresenta ERRO de concordância?",o:["Os agentes fiscalizaram a avenida.","Fazem dez anos que ele dirige.","Havia muitos veículos.","As multas foram aplicadas."],a:1,e:"Correto: 'Faz dez anos' — 'fazer' de tempo é impessoal (singular). 'Haver' de existir também: 'Havia muitos veículos'."},
+{d:"Português",q:"Em que opção a CRASE está correta?",o:["Ele foi à pé.","O documento foi entregue à autoridade.","Refiro-me à todos.","Cheguei à uma hora incerta."],a:1,e:"Crase = a (preposição) + a(s) (artigo). 'à autoridade' está certo. Não há crase antes de masculino ('a pé'), pronome ('a todos') nem, em regra, 'uma'."},
+{d:"Português",q:"O antônimo de 'PROIBIDO' é:",o:["Vedado","Permitido","Interditado","Impedido"],a:1,e:"Antônimo de proibido é 'permitido'. Os demais são sinônimos de proibido."},
+{d:"Português",q:"Em 'Pare! O sinal está vermelho.', o '!' indica:",o:["Pergunta","Ordem/ênfase (frase imperativa)","Dúvida","Enumeração"],a:1,e:"O ponto de exclamação marca ordem, ênfase ou emoção. 'Pare!' é imperativa."},
+{d:"Português",q:"Em 'O condutor que respeita as leis evita acidentes', 'que respeita as leis':",o:["É o sujeito","Caracteriza 'condutor' (oração adjetiva)","Não tem função","É vocativo"],a:1,e:"É oração subordinada adjetiva (pronome relativo 'que') que caracteriza 'condutor'."},
+{d:"Português",q:"Assinale a grafia correta:",o:["Excessão","Exceção","Esceção","Excesão"],a:1,e:"O correto é 'exceção', com -ç-."},
+{d:"Português",q:"'Embora estivesse cansado, cumpriu o plantão.' — 'embora' indica:",o:["Causa","Concessão (apesar de)","Conclusão","Tempo"],a:1,e:"'Embora' é conjunção concessiva: contraria a expectativa, equivale a 'apesar de'."},
+{d:"Português",q:"O plural de 'cidadão' é:",o:["Cidadões","Cidadãos","Cidadães","Cidadans"],a:1,e:"É 'cidadãos' — exceção a memorizar."},
+{d:"Português",q:"Em 'Os pedestres atravessaram a rua', o sujeito é:",o:["a rua","atravessaram","Os pedestres","com segurança"],a:2,e:"Quem atravessou? 'Os pedestres' — sujeito da oração."},
+{d:"Português",q:"Complete corretamente: 'Ele se comportou ___ no trânsito.'",o:["mau","mal","mao","máu"],a:1,e:"'Mal' é advérbio (oposto de bem): comportou-se mal. 'Mau' é adjetivo (oposto de bom)."},
+{d:"Português",q:"Assinale o uso correto de 'por que / porque':",o:["Não sei porque ele parou.","Ele parou por que o sinal fechou.","Ele parou porque o sinal fechou.","Porque você parou?"],a:2,e:"'Porque' (junto) indica causa/explicação: 'parou porque o sinal fechou'. 'Por que' (separado) inicia perguntas ou equivale a 'pelo qual'."},
+{d:"Português",q:"Na frase 'O agente multou o motorista', o termo 'o motorista' é:",o:["Sujeito","Objeto direto","Adjunto adverbial","Vocativo"],a:1,e:"'Multou' é verbo transitivo direto; 'o motorista' é o objeto direto (quem sofre a ação)."},
+{d:"Português",q:"Sinônimo de 'INFRAÇÃO' é:",o:["Elogio","Transgressão / violação","Permissão","Sinalização"],a:1,e:"Infração = transgressão, violação de uma norma. É o oposto de cumprir a regra."},
+{d:"Português",q:"A palavra 'trânsito' é classificada como:",o:["Verbo","Substantivo","Adjetivo","Advérbio"],a:1,e:"'Trânsito' é substantivo (nomeia algo). 'Transitar' seria o verbo."},
+{d:"Português",q:"Assinale a frase pontuada corretamente:",o:["O agente, fiscalizou a via.","Atenção condutores respeitem a faixa.","Motoristas, reduzam a velocidade nas escolas.","Reduza; a velocidade."],a:2,e:"Em C a vírgula isola o vocativo ('Motoristas'). Não se separa sujeito do verbo por vírgula (erro em A)."},
+{d:"Português",q:"'A fim de' e 'afim' — assinale o uso correto:",o:["Estudou a fim de passar no concurso.","Estudou afim de passar.","São palavras afim.","Ele é meu afim de estudos."],a:0,e:"'A fim de' = finalidade (para). 'Afim' = que tem afinidade/semelhança. O correto é 'a fim de passar'."},
+
+/* ================= MATEMÁTICA E RLM ================= */
+{d:"Matemática e RLM",q:"Um veículo percorre 240 km em 3 h. Velocidade média?",o:["60 km/h","70 km/h","80 km/h","90 km/h"],a:2,e:"240 ÷ 3 = 80 km/h."},
+{d:"Matemática e RLM",q:"Multa de R$ 195,23 com 40% de desconto. Valor a pagar?",o:["R$ 78,09","R$ 117,14","R$ 130,16","R$ 156,18"],a:1,e:"40% de 195,23 = 78,09; 195,23 − 78,09 = R$ 117,14."},
+{d:"Matemática e RLM",q:"5 agentes fazem um serviço em 6 dias. 10 agentes (mesmo ritmo) fazem em:",o:["12 dias","6 dias","3 dias","2 dias"],a:2,e:"Inversamente proporcional: o dobro de agentes, metade do tempo. 6 ÷ 2 = 3 dias."},
+{d:"Matemática e RLM",q:"Próximo número de 2, 4, 8, 16, ...:",o:["18","24","32","20"],a:2,e:"Cada termo é o dobro do anterior: 16 × 2 = 32."},
+{d:"Matemática e RLM",q:"15% de 200 veículos:",o:["15","20","25","30"],a:3,e:"0,15 × 200 = 30."},
+{d:"Matemática e RLM",q:"Salário de R$ 2.400 com aumento de 10%:",o:["R$ 2.410","R$ 2.640","R$ 2.700","R$ 2.840"],a:1,e:"10% de 2.400 = 240; 2.400 + 240 = R$ 2.640."},
+{d:"Matemática e RLM",q:"Valor de x em 3x + 5 = 20:",o:["3","5","7","15"],a:1,e:"3x = 15; x = 5."},
+{d:"Matemática e RLM",q:"Complete: segunda, quarta, sexta, ...",o:["sábado","domingo","terça","quinta"],a:1,e:"Avança de 2 em 2 dias: ...sexta, domingo."},
+{d:"Matemática e RLM",q:"Plantão das 7h às 19h dura:",o:["10 h","11 h","12 h","13 h"],a:2,e:"19 − 7 = 12 horas."},
+{d:"Matemática e RLM",q:"Se todo agente é servidor e João é agente, então:",o:["João não é servidor","João é servidor","Nem todo agente é servidor","João é motorista"],a:1,e:"Silogismo: João é, necessariamente, servidor."},
+{d:"Matemática e RLM",q:"Via de 1.200 m com placas a cada 150 m (início e fim). Quantas placas?",o:["8","9","10","12"],a:1,e:"1.200 ÷ 150 = 8 intervalos; + 1 = 9 placas."},
+{d:"Matemática e RLM",q:"A média de 6, 8 e 10 é:",o:["6","7","8","9"],a:2,e:"(6 + 8 + 10) ÷ 3 = 24 ÷ 3 = 8."},
+{d:"Matemática e RLM",q:"Metade de 3/4 é:",o:["3/8","1/2","2/3","3/2"],a:0,e:"(3/4) ÷ 2 = 3/8."},
+{d:"Matemática e RLM",q:"Um carro a 90 km/h percorre, em 40 min, aproximadamente:",o:["45 km","60 km","75 km","90 km"],a:1,e:"40 min = 2/3 de hora. 90 × (2/3) = 60 km."},
+{d:"Matemática e RLM",q:"O MMC (mínimo múltiplo comum) de 4 e 6 é:",o:["10","12","18","24"],a:1,e:"Múltiplos comuns de 4 e 6: 12, 24... O menor é 12."},
+{d:"Matemática e RLM",q:"Um retângulo de 8 m por 5 m tem perímetro:",o:["13 m","26 m","40 m","20 m"],a:1,e:"Perímetro = 2×(8+5) = 2×13 = 26 m. (A área seria 40 m².)"},
+{d:"Matemática e RLM",q:"Se 3 canetas custam R$ 6,00, quanto custam 7 canetas?",o:["R$ 12,00","R$ 14,00","R$ 18,00","R$ 21,00"],a:1,e:"Regra de três: 1 caneta = R$ 2,00; 7 × 2 = R$ 14,00."},
+{d:"Matemática e RLM",q:"Numa multa de R$ 293,47, um aumento de 3x (fator multiplicador) resulta em:",o:["R$ 586,94","R$ 880,41","R$ 293,47","R$ 900,00"],a:1,e:"293,47 × 3 = R$ 880,41."},
+{d:"Matemática e RLM",q:"A negação lógica de 'Todo carro é vermelho' é:",o:["Nenhum carro é vermelho","Existe pelo menos um carro que não é vermelho","Todo carro é azul","Alguns carros são vermelhos"],a:1,e:"A negação de 'todo A é B' é 'existe ao menos um A que não é B'."},
+{d:"Matemática e RLM",q:"20% de desconto em um curso de R$ 150,00 deixa o valor em:",o:["R$ 120,00","R$ 130,00","R$ 100,00","R$ 135,00"],a:0,e:"20% de 150 = 30; 150 − 30 = R$ 120,00."},
+
+/* ================= INFORMÁTICA ================= */
+{d:"Informática",q:"No Windows, Ctrl + C serve para:",o:["Colar","Copiar","Recortar","Desfazer"],a:1,e:"Ctrl+C copia; Ctrl+V cola; Ctrl+X recorta; Ctrl+Z desfaz."},
+{d:"Informática",q:"No Excel, =SOMA(A1:A5) faz o quê?",o:["Multiplica","Soma os valores de A1 a A5","Conta as células","Ordena"],a:1,e:"Soma o intervalo A1:A5. Para média, =MÉDIA(A1:A5)."},
+{d:"Informática",q:"Exemplo de navegador de internet:",o:["Word","Google Chrome","Explorador de Arquivos","Excel"],a:1,e:"Chrome (e Firefox, Edge) é navegador. Word/Excel são do Office."},
+{d:"Informática",q:"'Phishing' é:",o:["Uma impressora","Fraude que rouba dados imitando instituição confiável","Editor de vídeo","Peça do PC"],a:1,e:"Golpe com mensagens/sites falsos para capturar senhas e dados. Desconfie de links."},
+{d:"Informática",q:"Em um e-mail, o símbolo que separa usuário e domínio é:",o:["#","@","&","%"],a:1,e:"Formato usuario@dominio (ex.: nome@prefeitura.gov.br)."},
+{d:"Informática",q:"Exemplo de HARDWARE:",o:["Windows","O teclado","Word","Antivírus"],a:1,e:"Hardware é a parte física (teclado, mouse). Windows/Word/antivírus são software."},
+{d:"Informática",q:"Para salvar um arquivo pela 1ª vez definindo o nome, usa-se:",o:["Salvar como","Imprimir","Fechar","Copiar"],a:0,e:"'Salvar como' define nome, local e formato. 'Salvar' apenas grava alterações."},
+{d:"Informática",q:"Fazer 'backup' significa:",o:["Excluir arquivos","Criar cópia de segurança","Acelerar a internet","Trocar a fonte"],a:1,e:"Cópia de segurança dos dados em outro local (nuvem, HD externo)."},
+{d:"Informática",q:"O cadeado e o 'https' no navegador indicam:",o:["Site bloqueado","Conexão criptografada/segura","Sem internet","Site sempre falso"],a:1,e:"Indicam conexão criptografada; ainda assim, confira se o endereço é o correto."},
+{d:"Informática",q:"Ctrl + Z serve para:",o:["Salvar","Desfazer a última ação","Imprimir","Selecionar tudo"],a:1,e:"Ctrl+Z desfaz; Ctrl+Y refaz; Ctrl+A seleciona tudo; Ctrl+P imprime."},
+{d:"Informática",q:"A extensão típica de um documento do Word é:",o:["xlsx",".docx",".mp3",".exe"],a:1,e:".docx é do Word. .xlsx é do Excel; .mp3 é áudio; .exe é programa executável."},
+{d:"Informática",q:"Um serviço de armazenamento 'na nuvem' é:",o:["Bloco de Notas","Google Drive","Calculadora","Paint"],a:1,e:"Google Drive (como OneDrive e Dropbox) guarda arquivos na nuvem, acessíveis pela internet."},
+{d:"Informática",q:"Uma senha considerada FORTE geralmente:",o:["É '123456'","Mistura letras maiúsculas, minúsculas, números e símbolos","É o seu nome","Repete a mesma letra"],a:1,e:"Senha forte é longa e mistura maiúsculas, minúsculas, números e símbolos; evite dados óbvios e repetidos."},
+{d:"Informática",q:"Em um e-mail, o campo 'CCo' serve para:",o:["Anexar arquivos","Enviar cópia oculta (outros destinatários não veem)","Assinar o e-mail","Marcar como spam"],a:1,e:"CCo (cópia oculta) envia o e-mail a alguém sem que os demais destinatários vejam esse endereço."},
+{d:"Informática",q:"O atalho Ctrl + V:",o:["Copia","Cola","Recorta","Fecha"],a:1,e:"Ctrl+V cola o conteúdo que foi copiado (Ctrl+C) ou recortado (Ctrl+X)."},
+{d:"Informática",q:"Um antivírus serve para:",o:["Aumentar a tela","Detectar e remover programas maliciosos","Trocar o papel de parede","Imprimir mais rápido"],a:1,e:"O antivírus protege o computador identificando e removendo vírus e outros malwares."},
+{d:"Informática",q:"Arquivos ficam organizados no computador dentro de:",o:["Pastas (diretórios)","Botões","Cabos","Impressoras"],a:1,e:"As pastas (ou diretórios) organizam e agrupam os arquivos, podendo conter subpastas."},
+{d:"Informática",q:"No Word, o atalho para deixar o texto em NEGRITO costuma ser:",o:["Ctrl + N","Ctrl + P","Ctrl + S","Ctrl + L"],a:0,e:"No Word em português, Ctrl+N aplica negrito (Bold). Ctrl+I itálico e Ctrl+S sublinhado."},
+
+/* ================= ATUALIDADES E VC/BA ================= */
+{d:"Atualidades e VC/BA",q:"Vitória da Conquista fica em que região da Bahia?",o:["Litoral norte","Sudoeste baiano","Extremo sul","Recôncavo"],a:1,e:"É o principal polo do sudoeste da Bahia."},
+{d:"Atualidades e VC/BA",q:"O órgão de trânsito de Vitória da Conquista é conhecido pela sigla:",o:["DETRAN-VC","SIMTRANS","SENATRAN","CET-VC"],a:1,e:"O SIMTRANS administra o trânsito na cidade e é referência na Bahia."},
+{d:"Atualidades e VC/BA",q:"Na municipalização do trânsito na Bahia, Vitória da Conquista foi:",o:["A última a municipalizar","A segunda do estado, após Salvador","Nunca municipalizou","A capital"],a:1,e:"Foi o segundo município baiano a municipalizar o trânsito, atrás só de Salvador."},
+{d:"Atualidades e VC/BA",q:"O concurso para agente de trânsito de VC (2026) foi confirmado pela:",o:["Governadoria","Prefeita do município","Câmara dos Deputados","Polícia Federal"],a:1,e:"A prefeita confirmou o concurso, em ações para reduzir acidentes e reforçar a fiscalização."},
+{d:"Atualidades e VC/BA",q:"O objetivo de contratar novos agentes é, principalmente:",o:["Arrecadar mais multas","Reforçar a fiscalização e a segurança no trânsito","Substituir semáforos","Acabar com o ônibus"],a:1,e:"Ampliar fiscalização, educação e segurança viária diante do aumento de acidentes."},
+{d:"Atualidades e VC/BA",q:"A função primordial do agente de trânsito municipal é:",o:["Emitir CNH","Fiscalizar, orientar e educar no trânsito urbano","Consertar veículos","Julgar recursos em última instância"],a:1,e:"Fiscaliza, orienta e educa nas vias do município. A CNH é emitida pelo DETRAN."},
+{d:"Atualidades e VC/BA",q:"Vitória da Conquista é reconhecida como polo regional de:",o:["Petróleo offshore","Educação, saúde e comércio no sudoeste baiano","Turismo de praia","Mineração de carvão"],a:1,e:"Polo de saúde, educação e comércio para toda a região sudoeste."},
+{d:"Atualidades e VC/BA",q:"A capital do estado da Bahia é:",o:["Feira de Santana","Salvador","Ilhéus","Vitória da Conquista"],a:1,e:"Salvador é a capital da Bahia. Vitória da Conquista é o 3º maior município do estado."},
+{d:"Atualidades e VC/BA",q:"A principal rodovia federal que corta Vitória da Conquista é a:",o:["BR-101","BR-116 (Rio–Bahia)","BR-040","BR-153"],a:1,e:"A BR-116 (Rio–Bahia) atravessa o município, reforçando seu papel de entroncamento regional."},
+{d:"Atualidades e VC/BA",q:"Vitória da Conquista, por sua altitude, é conhecida por ter clima:",o:["Desértico","Ameno / mais frio que o restante da Bahia","Polar","Equatorial úmido"],a:1,e:"Situada em região de planalto/altitude, tem clima ameno, com temperaturas mais baixas que boa parte da Bahia."},
+{d:"Atualidades e VC/BA",q:"A universidade estadual sediada em Vitória da Conquista é a:",o:["UFBA","UESB","UNEB apenas","USP"],a:1,e:"A UESB (Universidade Estadual do Sudoeste da Bahia) tem sede em Vitória da Conquista, importante polo educacional."},
+{d:"Atualidades e VC/BA",q:"Um dos objetivos da educação para o trânsito é:",o:["Aumentar a frota","Formar cidadãos conscientes e reduzir acidentes","Vender mais carros","Diminuir o transporte público"],a:1,e:"A educação para o trânsito busca comportamentos seguros e responsáveis, reduzindo acidentes e mortes."},
+{d:"Atualidades e VC/BA",q:"O agente de trânsito, no exercício da função, deve pautar-se pela:",o:["Truculência","Legalidade, impessoalidade e cordialidade no atendimento ao cidadão","Escolha de quem multar por simpatia","Cobrança em dinheiro"],a:1,e:"Como servidor público, o agente age com base na legalidade, impessoalidade, moralidade e educação no trato com o cidadão."}
+];
+
+/* ================= APP ================= */
+var app=document.getElementById('app');
+var chipsEl=document.getElementById('chips');
+var progEl=document.getElementById('prog');
+var stMode=document.getElementById('stMode');
+var stCount=document.getElementById('stCount');
+var letras=["A","B","C","D","E"];
+
+var discList=[];
+for(var i=0;i<BANK.length;i++){ if(discList.indexOf(BANK[i].d)<0) discList.push(BANK[i].d); }
+
+var filtro="Todas", ordem=[], idx=0, answered={}, acertos=0, respondidas=0, porDisc={};
+
+function shuffle(a){ for(var i=a.length-1;i>0;i--){ var j=Math.floor(Math.random()*(i+1)); var t=a[i];a[i]=a[j];a[j]=t; } return a; }
+
+function countDisc(d){ var n=0; for(var i=0;i<BANK.length;i++){ if(BANK[i].d===d) n++; } return n; }
+
+function buildChips(){
+  chipsEl.innerHTML="";
+  function mk(label,val,count){
+    var b=document.createElement('button');
+    b.type="button";
+    b.className="chip"+(filtro===val?" active":"");
+    b.innerHTML=label+' <small>('+count+')</small>';
+    b.onclick=function(){ filtro=val; start(); };
+    chipsEl.appendChild(b);
+  }
+  mk("Todas","Todas",BANK.length);
+  for(var i=0;i<discList.length;i++){ mk(discList[i],discList[i],countDisc(discList[i])); }
+}
+
+function start(){
+  var pool=[];
+  for(var i=0;i<BANK.length;i++){ if(filtro==="Todas"||BANK[i].d===filtro) pool.push(i); }
+  ordem=shuffle(pool);
+  idx=0; answered={}; acertos=0; respondidas=0; porDisc={};
+  stMode.textContent = filtro==="Todas"?"Todas as disciplinas":filtro;
+  buildChips();
+  render();
+}
+
+function render(){
+  if(idx>=ordem.length){ return finish(); }
+  var q=BANK[ordem[idx]];
+  stCount.textContent=(idx+1)+" / "+ordem.length;
+  progEl.style.width=(idx/ordem.length*100)+"%";
+  var card=document.createElement('div');
+  card.className="card";
+  card.innerHTML='<span class="disc">'+q.d+'</span><div class="qnum">Questão '+(idx+1)+'</div><p class="enun">'+q.q+'</p>';
+  var opts=document.createElement('div');
+  for(var i=0;i<q.o.length;i++){
+    (function(i){
+      var b=document.createElement('button');
+      b.type="button"; b.className="opt";
+      b.innerHTML='<span class="k">'+letras[i]+'</span><span>'+q.o[i]+'</span>';
+      b.onclick=function(){ choose(i,q,opts); };
+      opts.appendChild(b);
+    })(i);
+  }
+  card.appendChild(opts);
+  var exp=document.createElement('div'); exp.className="exp"; exp.id="exp"; card.appendChild(exp);
+  var nav=document.createElement('div'); nav.className="nav";
+  var prev=document.createElement('button'); prev.type="button"; prev.className="btn ghost"; prev.textContent="Anterior";
+  prev.disabled=idx===0; prev.onclick=function(){ idx--; render(); };
+  var next=document.createElement('button'); next.type="button"; next.className="btn primary";
+  next.textContent=(idx===ordem.length-1)?"Ver resultado":"Próxima";
+  next.onclick=function(){ idx++; render(); };
+  nav.appendChild(prev); nav.appendChild(next);
+  card.appendChild(nav);
+  app.innerHTML=""; app.appendChild(card);
+  if(window.scrollTo){ try{ window.scrollTo(0,0); }catch(e){} }
+  if(answered[ordem[idx]]!==undefined){ replay(q,opts,answered[ordem[idx]]); }
+}
+
+function choose(i,q,opts){
+  if(answered[ordem[idx]]!==undefined) return;
+  answered[ordem[idx]]=i;
+  respondidas++;
+  if(!porDisc[q.d]) porDisc[q.d]={a:0,t:0};
+  porDisc[q.d].t++;
+  if(i===q.a){ acertos++; porDisc[q.d].a++; }
+  replay(q,opts,i);
+}
+
+function replay(q,opts,chosen){
+  var ch=opts.children;
+  for(var i=0;i<ch.length;i++){
+    ch[i].disabled=true;
+    if(i===q.a) ch[i].className="opt ok";
+    else if(i===chosen) ch[i].className="opt err";
+    else ch[i].className="opt dim";
+  }
+  var exp=document.getElementById("exp");
+  var acertou=(chosen===q.a);
+  exp.innerHTML='<b>'+(acertou?"Você acertou!":"Resposta correta: "+letras[q.a])+'</b><br>'+q.e;
+  exp.className="exp show";
+}
+
+function finish(){
+  progEl.style.width="100%";
+  var pct=respondidas?Math.round(acertos/respondidas*100):0;
+  var byd="";
+  var keys=[]; for(var k in porDisc){ if(porDisc.hasOwnProperty(k)) keys.push(k); }
+  keys.sort();
+  for(var i=0;i<keys.length;i++){ var d=keys[i]; byd+='<div><span>'+d+'</span><span>'+porDisc[d].a+'/'+porDisc[d].t+'</span></div>'; }
+  var emBranco=(respondidas<ordem.length)?(' &bull; '+(ordem.length-respondidas)+' em branco'):'';
+  app.innerHTML='<div class="done"><div class="disc">Resultado</div><h2>Simulado concluído!</h2>'+
+    '<div class="score">'+acertos+'/'+respondidas+'</div>'+
+    '<p style="color:#64748b;margin:.2em 0 0">'+pct+'% de acerto'+emBranco+'</p>'+
+    (byd?'<div class="byd">'+byd+'</div>':'')+
+    '<div class="nav"><button type="button" class="btn primary" id="again">Refazer</button></div></div>';
+  document.getElementById("again").onclick=function(){ start(); };
+  stCount.textContent=ordem.length+" / "+ordem.length;
+  if(window.scrollTo){ try{ window.scrollTo(0,0); }catch(e){} }
+}
+
+start();
+</script>
+</body>
+</html>
